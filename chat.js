@@ -3,8 +3,8 @@
             // Configuration - IMPORTANT: Add your Gemini API key here
             this.config = {
                 // Replace with your actual Gemini API key
-                apiKey: 'AIzaSyCWH68YxIUTvfCBNDiL-iPg_91F0n6d_m0', 
-                apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent',
+                apiKey: '', 
+                apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
                 
                 // System prompt to define bot behavior
                 systemPrompt: `You are a helpful, professional, and friendly AI assistant for a company website. Here are your guidelines:
