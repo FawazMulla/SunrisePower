@@ -4,11 +4,83 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sunrise Power</title>
+
+<!-- External CSS & Fonts -->
 <link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="chat.css">
+
+<!-- Inline CSS for slideshow -->
+<style>
+/* Slideshow Section */
+.slideshow-section {
+  position: relative;
+  width: 100%;
+  max-height: 450px;
+  overflow: hidden;
+  border-radius: 12px;
+  margin: 60px 0;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25);
+}
+
+.slide {
+  display: none;
+  width: 100%;
+  height: 450px;
+  position: relative;
+  animation: fadeEffect 1s ease-in-out;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-text {
+  position: absolute;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 15px 25px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-align: center;
+  width: 80%;
+}
+
+@keyframes fadeEffect {
+  from {opacity: 0.4;}
+  to {opacity: 1;}
+}
+
+/* Dots for navigation */
+.dots {
+  text-align: center;
+  position: relative;
+  margin-top: 15px;
+}
+
+.dot {
+  height: 12px;
+  width: 12px;
+  margin: 0 5px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+  transition: background-color 0.4s;
+}
+
+.active {
+  background-color: #ffb400;
+}
+</style>
 </head>
+
 <body>
 <header>
   <nav class="navbar">
@@ -40,6 +112,27 @@
   </div>
 </section>
 
+<!-- 🌞 Slideshow Section Above Footer -->
+<section class="slideshow-section">
+  <div class="slide fade">
+    <img src="Assets/Ashok Rao2.jpg" alt="Solar Panels Installation">
+    <div class="slide-text">Inaugration at Yeshwant College by the hands of Shri. Ashokrao Chavan</div>
+  </div>
+  <div class="slide fade">
+    <img src="Assets/Ashok Rao.jpg" alt="Solar Rooftop Systems">
+    <div class="slide-text">Reliable 115KW Solar Rooftop Solution </div>
+  </div>
+  <div class="slide fade">
+    <img src="Assets/ShankarRao.png" alt="Team at Work">
+    <div class="slide-text">Dr Shyamrao Wakode (Dean) DSCGMC appreciating our work</div>
+  </div>
+</section>
+<div class="dots">
+  <span class="dot"></span>
+  <span class="dot"></span>
+  <span class="dot"></span>
+</div>
+
 <section class="testimonials">
   <h2>TESTIMONIALS</h2>
   <p>Read what our customers say about switching to solar with Sunrise Power.</p>
@@ -53,7 +146,7 @@
           <span>&#x201C;</span>Sunrise Power made switching to solar effortless. Our bills dropped instantly! The team completed installation on time and professionally.<span>&#x201D;</span>
         </p>
         <p class="customer-info">
-          <strong>Avinash Kr</strong><br>
+          <strong>Shaikh Ayyub</strong><br>
           <small>Homeowner in Nanded</small>
         </p>
       </div>
@@ -68,8 +161,8 @@
           <span>&#x201C;</span>Professional team and top-quality installation. I am extremely satisfied with the after-sales service as well. Highly recommend their clean energy solutions.<span>&#x201D;</span>
         </p>
         <p class="customer-info">
-          <strong>Bharat Kunal</strong><br>
-          <small>Manager at XYZ Company</small>
+          <strong>Bharat Kunal Sharma</strong><br>
+          <small>Manager at Uma Exclusive Lodge</small>
         </p>
       </div>
     </div>
@@ -83,14 +176,13 @@
           <span>&#x201C;</span>Best decision we ever made. Clean energy, lower costs, and fantastic support from Sunrise Power's dedicated staff. True experts in solar installations.<span>&#x201D;</span>
         </p>
         <p class="customer-info">
-          <strong>Prabhakar D</strong><br>
-          <small>Founder / CEO at ZYX Corp</small>
+          <strong>Prabhakar Dighe</strong><br>
+          <small>Propreiter Ashirwad Milk House</small>
         </p>
       </div>
     </div>
   </div>
 </section>
-
 
 <!-- Review Modal -->
 <div id="reviewModal" class="review-modal">
@@ -102,70 +194,45 @@
   </div>
 </div>
 
-<div style="height: 600px;"></div>
+<!-- Chatbot -->
 <button class="chat-button" id="chatButton" aria-label="Open chat">
-        <svg viewBox="0 0 24 24">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-        </svg>
-        <div class="chat-badge">!</div>
-    </button>
-
-    <div class="chat-overlay" id="chatOverlay"></div>
-
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header">
-            <div class="header-info">
-                <h3>Surya</h3>
-                <div class="status">
-                    <div class="status-dot"></div>
-                    Your AI Powered Assistant for solar related Queries
-                </div>
-            </div>
-            <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-input">
-            <div class="input-wrapper">
-                <textarea 
-                    class="chat-textarea" 
-                    id="messageInput" 
-                    placeholder="Type your message..."
-                    rows="1"
-                ></textarea>
-            </div>
-            <button class="send-btn" id="sendBtn" aria-label="Send message">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-    
-<!-- <button class="chatbot-toggler" id="openModal">
-  <i class="fa-solid fa-comments"></i>
+  <svg viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+  <div class="chat-badge">!</div>
 </button>
 
-<div id="chatModal" class="chat-modal">
+<div class="chat-overlay" id="chatOverlay"></div>
+
+<div class="chat-modal" id="chatModal">
   <div class="chat-header">
-    <span>Comment Box</span>
-    <span class="close">&times;</span>
+      <div class="header-info">
+          <h3>Surya</h3>
+          <div class="status">
+              <div class="status-dot"></div>
+              Your AI Powered Assistant for solar related Queries
+          </div>
+      </div>
+      <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
   </div>
-  <div class="chat-body" id="chatBody"></div>
-  <div class="chat-footer">
-    <input type="text" id="chatInput" placeholder="Type a comment..." />
-    <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+  <div class="chat-messages" id="chatMessages">
+      <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dots">
+              <span></span><span></span><span></span>
+          </div>
+      </div>
   </div>
-</div> -->
+  <div class="chat-input">
+      <div class="input-wrapper">
+          <textarea class="chat-textarea" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" aria-label="Send message">
+          <svg viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+      </button>
+  </div>
+</div>
 
 <footer class="footer" id="contact">
   <div class="footer-container">
@@ -208,66 +275,27 @@
   </div>
   <div class="footer-bottom">© 2025 SUNRISE POWER. All rights reserved.</div>
 </footer>
+
+<!-- Scripts -->
 <script src="chat.js"></script>
+
+<!-- Slideshow Script -->
 <script>
-const reviews = {
-  review1: {
-    title: "Affordable & Efficient Installation",
-    stars: 5,
-    text: "Sunrise Power made switching to solar effortless. Our bills dropped instantly! The team completed installation on time and professionally."
-  },
-  review2: {
-    title: "Professional & Reliable Team",
-    stars: 4,
-    text: "Professional team and top-quality installation. I am extremely satisfied with the after-sales service as well."
-  },
-  review3: {
-    title: "Clean Energy & Cost Savings",
-    stars: 5,
-    text: "Best decision we ever made. Clean energy, lower costs, and fantastic support from Sunrise Power's dedicated staff."
-  },
-  review4: {
-    title: "Excellent Customer Support",
-    stars: 4,
-    text: "Reliable service with excellent customer support. They answered all our queries patiently and ensured smooth installation."
-  }
-};
+let slideIndex = 0;
+showSlides();
 
-// Select modal elements
-const modal = document.getElementById("reviewModal");
-const modalTitle = document.getElementById("reviewTitle");
-const modalText = document.getElementById("reviewText");
-const modalStars = document.getElementById("reviewStars");
-const closeModal = modal.querySelector(".close");
-
-// Open modal on testimonial click
-document.querySelectorAll(".testimonial-card").forEach(card => {
-  card.addEventListener("click", () => {
-    const id = card.getAttribute("data-review");
-    const review = reviews[id];
-    modalTitle.textContent = review.title;
-    modalText.textContent = review.text;
-    modalStars.innerHTML = "";
-    for (let i = 0; i < 5; i++) {
-      const star = document.createElement("i");
-      star.className = i < review.stars ? "fa-solid fa-star" : "fa-regular fa-star";
-      modalStars.appendChild(star);
-    }
-    modal.style.display = "flex";
-  });
-
-  // Pause horizontal scroll on hover
-  card.addEventListener("mouseenter", () => {
-    document.querySelector(".testimonial-track").style.animationPlayState = "paused";
-  });
-  card.addEventListener("mouseleave", () => {
-    document.querySelector(".testimonial-track").style.animationPlayState = "running";
-  });
-});
-
-// Close modal
-closeModal.onclick = () => modal.style.display = "none";
-window.onclick = (e) => { if(e.target === modal) modal.style.display = "none"; };
+function showSlides() {
+  const slides = document.getElementsByClassName("slide");
+  const dots = document.getElementsByClassName("dot");
+  for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
+  slideIndex++;
+  if (slideIndex > slides.length) slideIndex = 1;
+  for (let i = 0; i < dots.length; i++) dots[i].classList.remove("active");
+  slides[slideIndex - 1].style.display = "block";
+  dots[slideIndex - 1].classList.add("active");
+  setTimeout(showSlides, 4000); // Change image every 4 seconds
+}
 </script>
+
 </body>
 </html>
