@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>About Us - Sunrise Power</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="chat.css">
+<style>
+/* Base */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:"Poppins",sans-serif;color:#3D2B1F;line-height:1.6;}
+a{text-decoration:none;color:inherit;}
+
+/* Navbar */
+header {
+    position: fixed;           /* Keep navbar on top */
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 15px 5%;
+    z-index: 999;
+    background: rgba(255, 255, 255, 0.2); /* semi-transparent white */
+    backdrop-filter: blur(10px);          /* the blur effect */
+    -webkit-backdrop-filter: blur(10px);  /* Safari support */
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); /* optional subtle shadow */
+    transition: background 0.3s ease, padding 0.3s ease;
+}
+
+.nav-links a, .nav-right a, .nav-right i {
+    color: #000000; /* Keep text/icons visible */
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+}
+
+.navbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;}
+.nav-links{display:flex;list-style:none;gap:35px;font-size:1rem;}
+.nav-links a:hover{color:#ddd;}
+.nav-right{display:flex;align-items:center;gap:25px;}
+.nav-right i{font-size:1.2rem;cursor:pointer;}
+.navbar .contact-btn{color:#fff;border:1px solid #fff;padding:8px 15px;border-radius:5px;transition:0.3s;}
+.navbar .contact-btn:hover{background:#fff;color:#000;}
+.logo img{height:60px;}
+
+/* Hero Section */
+.about-hero{height:60vh;background:url('https://i.pinimg.com/1200x/ea/cb/d3/eacbd3ac6a3d097d54dd5a6d9c8f47b7.jpg') center/cover no-repeat;display:flex;align-items:center;padding:0 5%;position:relative;color:#fff;}
+.about-hero::before{content:"";position:absolute;inset:0;background:rgba(0,0,0,0.5);}
+.about-hero .hero-content{max-width:800px;position:relative;z-index:1;text-shadow:1px 1px 4px rgba(0,0,0,0.5);}
+.about-hero .hero-content h1{font-size:3.5rem;font-weight:600;}
+.about-hero .hero-content p{font-size:1.1rem;margin-top:15px;}
+
+/* About Section */
+.about-section{background:#fcf8f0;padding:80px 20px;text-align:center;}
+.about-section h2{font-size:2.5rem;margin-bottom:1.5rem;color:#3D2B1F;}
+.about-section p{max-width:800px;margin:0 auto 1.5rem;font-size:1.1rem;color:#5a4435;line-height:1.7;}
+
+/* Team Section */
+.team-section{padding:80px 20px;background:#3D2B1F;color:#fcf8f0;text-align:center;}
+.team-section h2{font-size:2.5rem;margin-bottom:3rem;}
+.department{margin-bottom:60px;}
+.department h3{font-size:1.8rem;color:#fdd835;margin-bottom:30px;padding-bottom:10px;border-bottom:1px solid #5a4435;display:inline-block;}
+.team-cards{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;max-width:1200px;margin:0 auto;}
+.team-member{background:#5a4435;border-radius:10px;padding:25px;width:250px;text-align:center;transition:transform 0.3s ease,box-shadow 0.3s ease;}
+.team-member:hover{transform:translateY(-10px);box-shadow:0 10px 20px rgba(0,0,0,0.4);}
+.team-member img{width:120px;height:120px;border-radius:50%;margin-bottom:20px;border:3px solid #fdd835;object-fit:cover;}
+.team-member h3{margin-bottom:5px;font-size:1.2rem;}
+.team-member p{font-size:0.95rem;color:#e0d9ce;}
+
+/* Chatbot */
+.chatbot-toggler{position:fixed;bottom:30px;right:30px;width:60px;height:60px;background:#fdd835;color:#000;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2rem;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:1000;transition:transform 0.3s,box-shadow 0.3s;}
+.chatbot-toggler:hover{transform:scale(1.1);box-shadow:0 6px 12px rgba(0,0,0,0.3);}
+.chat-modal{display:none;position:fixed;bottom:80px;right:20px;width:350px;height:450px;background:#fff;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);overflow:hidden;flex-direction:column;z-index:2000;}
+.chat-header{background:#f1c40f;padding:10px;font-weight:600;color:#333;display:flex;justify-content:space-between;align-items:center;}
+.chat-header .close{cursor:pointer;font-size:20px;}
+.chat-body{flex:1;padding:10px;overflow-y:auto;background:#fafafa;font-size:0.9rem;color:#444;}
+.chat-footer{display:flex;border-top:1px solid #ddd;}
+.chat-footer input{flex:1;padding:10px;border:none;outline:none;}
+.chat-footer button{background:#3498db;border:none;color:white;padding:0 15px;cursor:pointer;transition:0.3s;}
+.chat-footer button:hover{background:#217dbb;}
+
+/* Footer */
+footer a{margin:0 12px;color:white;font-size:28px;transition:color 0.3s ease, transform 0.3s ease;}
+footer a:hover{color:#f1c40f;transform:scale(1.2);}
+
+/* Responsive Media Queries */
+@media(max-width:1024px){
+  .about-hero .hero-content h1{font-size:3rem;}
+  .about-hero .hero-content p{font-size:1rem;}
+  .team-cards{gap:25px;}
+  .team-member{width:200px;padding:20px;}
+}
+
+@media(max-width:768px){
+  .navbar{flex-direction:column;gap:15px;}
+  .nav-links{flex-direction:column;gap:15px;}
+  .about-hero{height:50vh;}
+  .about-hero .hero-content h1{font-size:2.5rem;}
+  .about-hero .hero-content p{font-size:0.95rem;}
+  .about-section{padding:60px 15px;}
+  .team-section{padding:60px 15px;}
+  .team-cards{flex-direction:column;align-items:center;gap:20px;}
+  .team-member{width:80%;}
+}
+
+@media(max-width:480px){
+  .about-hero{height:40vh;}
+  .about-hero .hero-content h1{font-size:2rem;}
+  .about-hero .hero-content p{font-size:0.9rem;}
+  .team-member{padding:15px;}
+  .team-member h3{font-size:1.1rem;}
+  .team-member p{font-size:0.85rem;}
+  .navbar .contact-btn{padding:6px 10px;font-size:0.9rem;}
+  .nav-right{gap:15px;}
+  .team-member {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.6s ease-out;
+}
+
+.team-member.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <nav class="navbar">
+    <a href="index.html" class="logo">
+      <img src="Assets/sunrise power logo.png" alt="Sunrise Power Logo">
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About Us</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="Projects.html">Projects</a></li>
+      <li><a href="Products.html">Products</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="https://www.solarpower.org/" class="fas fa-globe"></a>
+      <a href="Index.html" class="contact-btn">Contact Us</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero about-hero">
+  <div class="hero-content">
+    <h1>About Sunrise Power</h1>
+    <p>A trusted provider of solar electric solutions for residential, commercial, and industrial sectors, committed to promoting clean, sustainable, and renewable energy.</p>
+  </div>
+</section>
+
+<section class="about-section">
+  <h2>Our Spark: The Story Behind Sunrise Power</h2>
+  <p>Sunrise Power was born from a simple but powerful idea: that every family and business in India deserves reliable, affordable, and clean energy...</p>
+  <p>Our motivation was to bridge this gap. We envisioned a future where rooftops are not just shelters, but powerhouses of self-reliance...</p>
+</section>
+
+<section class="team-section">
+  <h2>Meet Our Dedicated Team</h2>
+  <!-- Management -->
+  <div class="department">
+    <h3>Management</h3>
+    <div class="team-cards">
+      <div class="team-member">
+       
+        <h3>Shaikh Ayyub</h3>
+        <p>Chairperson</p>
+      </div>
+      <div class="team-member">
+    
+        <h3>Shaikh Salik Irshad</h3>
+        <p>Founder & CEO</p>
+      </div>
+    </div>
+  </div>
+  <!-- Structural Team -->
+  <div class="department">
+    <h3>Structural Team for Solar Panels</h3>
+    <div class="team-cards">
+      <div class="team-member">
+       
+        <h3>Shaikh Nayeem</h3>
+        <p>Structural Lead</p>
+      </div>
+      <div class="team-member">
+       
+        <h3>Shaikh Adnan</h3>
+        <p>Fabrication Specialist</p>
+      </div>
+      <div class="team-member">
+        
+        <h3>Shaikh Ayan</h3>
+        <p>Installation Expert</p>
+      </div>
+      <div class="team-member">
+       
+        <h3>Shaikh Anwar</h3>
+        <p>Technician</p>
+      </div>
+    </div>
+  </div>
+  <!-- Electrical Department -->
+  <div class="department">
+    <h3>Electrical Department</h3>
+    <div class="team-cards">
+      <div class="team-member">
+   
+        <h3>Shaikh Jameel</h3>
+        <p>Lead Electrical Engineer</p>
+      </div>
+      <div class="team-member">
+
+        <h3>Shaikh Sarfaraz</h3>
+        <p>Senior Electrician</p>
+      </div>
+      <div class="team-member">
+     
+        <h3>Shera Khan</h3>
+        <p>Electrician</p>
+      </div>
+      <div class="team-member">
+     
+        <h3>Khaliq Ansari</h3>
+        <p>Electrician</p>
+      </div>
+      <div class="team-member">
+        <h3>Abrar Khan</h3>
+        <p>Junior Engineer</p>
+      </div>
+    </div>
+  </div>
+</section>
+<button class="chat-button" id="chatButton" aria-label="Open chat">
+        <svg viewBox="0 0 24 24">
+            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+        </svg>
+        <div class="chat-badge">!</div>
+    </button>
+
+    <div class="chat-overlay" id="chatOverlay"></div>
+
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-header">
+            <div class="header-info">
+                <h3>Surya</h3>
+                <div class="status">
+                    <div class="status-dot"></div>
+                    Your AI Powered Assistant for solar related Queries
+                </div>
+            </div>
+            <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <div class="input-wrapper">
+                <textarea 
+                    class="chat-textarea" 
+                    id="messageInput" 
+                    placeholder="Type your message..."
+                    rows="1"
+                ></textarea>
+            </div>
+            <button class="send-btn" id="sendBtn" aria-label="Send message">
+                <svg viewBox="0 0 24 24">
+                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <script src="chat.js"></script>
+<!-- <button class="chatbot-toggler" id="openModal"><i class="fa-solid fa-comments"></i></button>
+
+<div id="chatModal" class="chat-modal">
+  <div class="chat-header"><span class="close">&times;</span></div>
+  <div class="chat-body" id="chatBody"></div>
+  <div class="chat-footer">
+    <input type="text" id="chatInput" placeholder="Type a comment..." />
+    <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+  </div>
+</div> -->
+
+<footer>
+  <p style="text-align: center; padding: 20px; background-color: #3D2B1F; color: white;">
+    <a href="https://www.instagram.com/sunrise_power_official" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="https://wa.me/+919923138363" target="_blank"><i class="fab fa-whatsapp"></i></a>
+    <a href="https://www.facebook.com/profile.php?id=100090373153574" target="_blank"><i class="fab fa-facebook"></i></a>
+    <a href="https://www.youtube.com/@Sunrisepower2all" target="_blank"><i class="fab fa-youtube"></i></a>
+    <br><br>© 2024 Sunrise Power. All rights reserved.
+  </p>
+</footer>
+
+<script>
+  // --- Chat Modal Logic ---
+  const chatModal = document.getElementById("chatModal");
+  const openBtn = document.getElementById("openModal");
+  const closeBtn = document.querySelector(".chat-header .close");
+  const chatBody = document.getElementById("chatBody");
+  const chatInput = document.getElementById("chatInput");
+  const sendBtn = document.getElementById("sendBtn");
+
+  openBtn.onclick = () => { chatModal.style.display = "flex"; }
+  closeBtn.onclick = () => { chatModal.style.display = "none"; }
+  window.onclick = (e) => { if (e.target == chatModal) chatModal.style.display = "none"; }
+
+  sendBtn.onclick = () => {
+    let msg = chatInput.value.trim();
+    if(msg){
+      let newMsg = document.createElement("div");
+      newMsg.textContent = msg;
+      newMsg.style.margin = "10px 0";
+      newMsg.style.padding = "8px 12px";
+      newMsg.style.background = "#eee";
+      newMsg.style.borderRadius = "10px";
+      chatBody.appendChild(newMsg);
+      chatInput.value = "";
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+  };
+
+  // --- Scroll Animation for Team Members ---
+  const teamMembers = document.querySelectorAll('.team-member');
+
+  const observerOptions = {
+    threshold: 0.2
+  };
+
+  const observer = new IntersectionObserver((entries, observer) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target); // Animate only once
+      }
+    });
+  }, observerOptions);
+
+  teamMembers.forEach(member => {
+    observer.observe(member);
+  });
+</script>
+
+</body>
+</html>
