@@ -4,7 +4,7 @@
             this.config = {
                 // Replace with your actual Gemini API key
                 // apiKey: '', 
-                apiKey: '', 
+                apiKey: 'AIzaSyC6gYdvNvZCfNIcHQBc-gZNVP-MLfeZldk', 
                 apiUrl: 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
                 
                 // System prompt to define bot behavior
