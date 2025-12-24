@@ -5,111 +5,150 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Our Products - Sunrise Power</title>
 
+<!-- External CSS & Fonts -->
+<link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" />
+<link rel="stylesheet" href="chat.css">
 
 <style>
-    /* Reset and base styles */
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{
-      font-family:"Poppins",sans-serif;
-      color:#3D2B1F;
-      background-color:#fcf8f0;
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-    a{text-decoration:none;color:inherit;}
+/* Products page specific styles */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color:#fcf8f0;
+    color:#3D2B1F;
+}
 
-    /* Main content area to take up available space */
-    main {
-        flex-grow: 1;
-    }
-/* Footer */
-footer a{margin:0 12px;color:white;font-size:28px;transition:color 0.3s ease, transform 0.3s ease;}
-footer a:hover{color:#f1c40f;transform:scale(1.2);}
+main {
+    flex-grow: 1;
+}
 
-    /* Navbar */
-    .navbar{display:flex;justify-content:space-between;align-items:center;padding:20px 5%;background:#3D2B1F;color:#fff;}
-    .navbar .nav-links a,.navbar .nav-right i{color:#fff;}
-    .navbar .contact-btn{color:#fff;border:1px solid #fff; padding: 8px 16px; border-radius: 5px; transition: background 0.3s, color 0.3s;}
-    .navbar .contact-btn:hover{background:#fff;color:#000;}
-    .logo img{height:60px; vertical-align: middle;}
-    .nav-links{display:flex;list-style:none;gap:35px;font-size:1rem;}
-    .nav-links a:hover{color:#ddd;}
-    .nav-links a.active{border-bottom:2px solid #fdd835;}
-    .nav-right{display:flex;align-items:center;gap:25px;}
-    .nav-right i{font-size:1.2rem;cursor:pointer;}
+.page-section{
+    padding:80px 5%;
+    text-align:center;
+    margin-top: 80px;
+}
+.page-section h2{
+    font-size:2.5rem;
+    margin-bottom:50px;
+    color:#3D2B1F;
+}
 
-    /* Section */
-    .page-section{padding:80px 5%;text-align:center;}
-    .page-section h2{font-size:2.5rem;margin-bottom:50px;color:#3D2B1F;}
+.products-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:30px;
+    max-width:800px;
+    margin:0 auto;
+}
+.product-category-card{
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.08);
+    transition:transform 0.3s,box-shadow 0.3s;
+    padding:40px 20px;
+    cursor:pointer;
+}
+.product-category-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.12);
+}
+.product-category-card i{
+    font-size:80px;
+    color:#3D2B1F;
+    margin-bottom:20px;
+}
+.product-category-card h3{
+    font-size:1.5rem;
+    color:#3D2B1F;
+}
 
-    /* Category Cards */
-    .products-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:30px;
-      max-width:800px;
-      margin:0 auto;
+.brand-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    max-width:1100px;
+    margin:30px auto;
+}
+.brand-card{
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    padding:20px;
+    text-align:left;
+    cursor:pointer;
+    transition:transform 0.3s;
+}
+.brand-card:hover{
+    transform:translateY(-6px);
+}
+.brand-card h4{
+    color:#3D2B1F;
+    margin-bottom:10px;
+}
+.brand-card p{
+    font-size:14px;
+    color:#555;
+}
+@media (max-width: 768px) {
+    .brand-grid {
+        grid-template-columns: 1fr;
     }
-    .product-category-card{
-      background:#fff;border-radius:10px;overflow:hidden;text-align:center;
-      box-shadow:0 4px 15px rgba(0,0,0,0.08);
-      transition:transform 0.3s,box-shadow 0.3s;
-      padding:40px 20px;
-      cursor:pointer;
-    }
-    .product-category-card:hover{transform:translateY(-10px);box-shadow:0 8px 25px rgba(0,0,0,0.12);}
-    .product-category-card i{font-size:80px;color:#3D2B1F;margin-bottom:20px;}
-    .product-category-card h3{font-size:1.5rem;color:#3D2B1F;}
+}
 
-    /* Brand Grid (2x2) */
-    .brand-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:20px;
-      max-width:1100px;
-      margin:30px auto;
-    }
-    .brand-card{
-      background:#fff;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      padding:20px;text-align:left;cursor:pointer;transition:transform 0.3s;
-    }
-    .brand-card:hover{transform:translateY(-6px);}
-    .brand-card h4{color:#3D2B1F;margin-bottom:10px;}
-    .brand-card p{font-size:14px;color:#555;}
-    /* Ensure the brand grid is responsive on smaller screens */
-    @media (max-width: 768px) {
-        .brand-grid {
-            grid-template-columns: 1fr;
-        }
-    }
+.catalogue-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    max-width:1200px;
+    margin:30px auto;
+}
+.catalogue-card{
+    background:#fff;
+    border-radius:10px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    padding:15px;
+    text-align:center;
+}
+.catalogue-card img{
+    width:100%;
+    height:200px;
+    object-fit:cover;
+    border-radius:8px;
+    margin-bottom:10px;
+}
+.catalogue-card h5{
+    color:#3D2B1F;
+    margin-bottom:5px;
+}
+.catalogue-card p{
+    font-size:14px;
+    color:#555;
+}
 
+.back-button{
+    background:#3D2B1F;
+    color:#fff;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    font-size:1rem;
+    cursor:pointer;
+    margin-bottom:40px;
+    transition:background 0.3s;
+}
+.back-button:hover{
+    background:#5a4435;
+}
 
-    /* Catalogue grid */
-    .catalogue-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
-      gap:20px;
-      max-width:1200px;
-      margin:30px auto;
-    }
-    .catalogue-card{
-      background:#fff;border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.08);
-      padding:15px;text-align:center;
-    }
-    .catalogue-card img{width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:10px;}
-    .catalogue-card h5{color:#3D2B1F;margin-bottom:5px;}
-    .catalogue-card p{font-size:14px;color:#555;}
-
-    /* Back Button */
-    .back-button{background:#3D2B1F;color:#fff;border:none;padding:12px 25px;border-radius:5px;font-size:1rem;
-    cursor:pointer;margin-bottom:40px;transition:background 0.3s;}
-    .back-button:hover{background:#5a4435;}
-
-    .hidden{display:none;}
+.hidden{
+    display:none;
+}
 </style>
 </head>
 
@@ -126,7 +165,7 @@ footer a:hover{color:#f1c40f;transform:scale(1.2);}
     </ul>
     <div class="nav-right">
       <a href="https://www.solarpower.org/" class="fas fa-globe"></a>
-      <a href="Index.html" class="contact-btn">Contact Us</a>
+      <a href="#contact" class="contact-btn">Contact Us</a>
     </div>
   </nav>
 </header>
@@ -468,6 +507,47 @@ footer a:hover{color:#f1c40f;transform:scale(1.2);}
 
 </main>
 
+<button class="chat-button" id="chatButton" aria-label="Open chat">
+  <svg viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+  <div class="chat-badge">!</div>
+</button>
+
+<div class="chat-overlay" id="chatOverlay"></div>
+
+<div class="chat-modal" id="chatModal">
+  <div class="chat-header">
+      <div class="header-info">
+          <h3>Surya</h3>
+          <div class="status">
+              <div class="status-dot"></div>
+              Your AI Powered Assistant for solar related Queries
+          </div>
+      </div>
+      <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
+  </div>
+  <div class="chat-messages" id="chatMessages">
+      <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dots">
+              <span></span><span></span><span></span>
+          </div>
+      </div>
+  </div>
+  <div class="chat-input">
+      <div class="input-wrapper">
+          <textarea class="chat-textarea" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" aria-label="Send message">
+          <svg viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+      </button>
+  </div>
+</div>
+
+<script src="chat.js"></script>
+
 <script>
     const categoriesSection = document.getElementById('categories-section');
     const brandSections = document.querySelectorAll('#solar-brands, #inverter-brands');
@@ -493,14 +573,46 @@ footer a:hover{color:#f1c40f;transform:scale(1.2);}
     }
 </script>
 
-<footer>
-  <p style="text-align: center; padding: 20px; background-color: #3D2B1F; color: white;">
-    <a href="https://www.instagram.com/sunrise_power_official" target="_blank"><i class="fab fa-instagram"></i></a>
-    <a href="https://wa.me/+919923138363" target="_blank"><i class="fab fa-whatsapp"></i></a>
-    <a href="https://www.facebook.com/profile.php?id=100090373153574" target="_blank"><i class="fab fa-facebook"></i></a>
-    <a href="https://www.youtube.com/@Sunrisepower2all" target="_blank"><i class="fab fa-youtube"></i></a>
-    <br><br>© 2024 Sunrise Power. All rights reserved.
-  </p>
+<footer class="footer" id="contact">
+  <div class="footer-container">
+    <div class="footer-col">
+      <img src="Assets/sunrise power logo.png" height="50" alt="Sunrise Power Logo" style="margin-bottom: 10px;">
+      <h3>SUNRISE POWER</h3>
+      <p>Empowering Maharashtra with reliable and sustainable solar energy solutions. Specializing in residential, commercial, and industrial solar installations since 2012.</p>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/profile.php?id=100090373153574" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/sunrise_power_official" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/+919923138363" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.youtube.com/@Sunrisepower2all" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Our Services</h4>
+      <ul>
+        <li>Solar Installations</li>
+        <li>Annual Maintenance Contracts</li>
+        <li>Consultation Services</li>
+        <li>Custom Solar Solutions</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="Index.html">Home</a></li>
+        <li><a href="About.html">About Us</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="Projects.html">Projects</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <p><i class="fas fa-map-marker-alt"></i> 53B, Canal Bypass Road, Nomaniya Nagar, Taroda BK, Nanded-431605</p><br>
+      <p><i class="fas fa-phone"></i> +91-9923138363 / 8329205927</p><br>
+      <p><i class="fas fa-envelope"></i> sunrisepower2all@gmail.com</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 SUNRISE POWER. All rights reserved.</div>
 </footer>
 </body>
 </html>

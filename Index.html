@@ -76,7 +76,7 @@
   transition: background-color 0.4s;
 }
 
-.active {
+.active1 {
   background-color: #ffb400;
 }
 </style>
@@ -333,9 +333,9 @@ function showSlides() {
   for (let i = 0; i < slides.length; i++) slides[i].style.display = "none";
   slideIndex++;
   if (slideIndex > slides.length) slideIndex = 1;
-  for (let i = 0; i < dots.length; i++) dots[i].classList.remove("active");
+  for (let i = 0; i < dots.length; i++) dots[i].classList.remove("active1");
   slides[slideIndex - 1].style.display = "block";
-  dots[slideIndex - 1].classList.add("active");
+  dots[slideIndex - 1].classList.add("active1");
   setTimeout(showSlides, 4000); // Change image every 4 seconds
 }
 </script>

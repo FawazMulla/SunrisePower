@@ -5,39 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Our Projects - Sunrise Power</title>
 
+<!-- External CSS & Fonts -->
+<link rel="stylesheet" href="styles.css" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" />
 <link rel="stylesheet" href="chat.css">
+
 <style>
-/* Reset & base styles */
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:"Poppins",sans-serif;color:#3D2B1F;background-color:#fcf8f0;}
-a{text-decoration:none;color:inherit;}
+/* Projects page specific styles */
+.page-section{
+    padding:80px 5%;
+    text-align:center;
+    background-color:#fcf8f0;
+    color:#3D2B1F;
+    margin-top: 80px;
+}
+.page-section h2{
+    font-size:2.5rem;
+    margin-bottom:50px;
+    color:#3D2B1F;
+}
 
-/* Navbar */
-.navbar{display:flex;justify-content:space-between;align-items:center;padding:20px 5%;background:#3D2B1F;color:#fff;}
-.navbar .nav-links a,.navbar .nav-right i{color:#fff;}
-.navbar .contact-btn{color:#fff;border:1px solid #fff; padding: 8px 16px; border-radius: 5px; transition: background 0.3s, color 0.3s;}
-.navbar .contact-btn:hover{background:#fff;color:#000;}
-.logo img{height:60px; vertical-align: middle;}
-.nav-links{display:flex;list-style:none;gap:35px;font-size:1rem;}
-.nav-links a:hover{color:#ddd;}
-.nav-right{display:flex;align-items:center;gap:25px;}
-.nav-right i{font-size:1.2rem;cursor:pointer;}
-
-/* Chatbot button */
-.chatbot-toggler{position:fixed;bottom:30px;right:30px;width:60px;height:60px;background:#fdd835;
-    color:#000;border:none;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:2rem;cursor:pointer;box-shadow:0 4px 8px rgba(0,0,0,0.2);z-index:1000;
-    transition:transform 0.3s,box-shadow 0.3s;}
-.chatbot-toggler:hover{transform:scale(1.1);box-shadow:0 6px 12px rgba(0,0,0,0.3);}
-
-/* Section headings */
-.page-section{padding:80px 5%;text-align:center;}
-.page-section h2{font-size:2.5rem;margin-bottom:50px;color:#3D2B1F;}
-
-/* --- 2x2 Project Categories Grid --- */
 .projects-grid{
     display:grid;
     grid-template-columns:repeat(2,1fr);
@@ -50,54 +39,81 @@ a{text-decoration:none;color:inherit;}
     .projects-grid{grid-template-columns:1fr;}
 }
 
-/* Category Cards */
 .project-category-card{
-    background:#fff;border-radius:10px;overflow:hidden;text-align:center;
+    background:#fff;
+    border-radius:10px;
+    overflow:hidden;
+    text-align:center;
     box-shadow:0 4px 15px rgba(0,0,0,0.08);
     transition:transform 0.3s,box-shadow 0.3s;
-    position:relative;color:#fff;cursor:pointer;
+    position:relative;
+    color:#fff;
+    cursor:pointer;
 }
-.project-category-card:hover{transform:translateY(-10px);box-shadow:0 8px 25px rgba(0,0,0,0.12);}
-.project-category-card img{width:100%;height:350px;object-fit:cover;transition:transform 0.3s;}
-.project-category-card:hover img{transform:scale(1.05);}
+.project-category-card:hover{
+    transform:translateY(-10px);
+    box-shadow:0 8px 25px rgba(0,0,0,0.12);
+}
+.project-category-card img{
+    width:100%;
+    height:350px;
+    object-fit:cover;
+    transition:transform 0.3s;
+}
+.project-category-card:hover img{
+    transform:scale(1.05);
+}
 .project-category-card h3{
-    position:absolute;bottom:0;left:0;width:100%;padding:20px;
+    position:absolute;
+    bottom:0;
+    left:0;
+    width:100%;
+    padding:20px;
     font-size:1.8rem;
     background:linear-gradient(to top,rgba(0,0,0,0.8),transparent);
     text-shadow:1px 1px 3px rgba(0,0,0,0.7);
 }
 
-/* Gallery pages */
-.gallery-section p{font-size:1.1rem;max-width:800px;margin:-30px auto 50px;color:#5a4435;}
-.photo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px;max-width:1400px;margin:0 auto;}
-.photo-grid a img{width:100%;height:250px;object-fit:cover;border-radius:10px;transition:transform 0.3s,box-shadow 0.3s;}
-.photo-grid a:hover img{transform:scale(1.05);box-shadow:0 8px 25px rgba(0,0,0,0.15);}
-.back-button{background:#3D2B1F;color:#fff;border:none;padding:12px 25px;border-radius:5px;font-size:1rem;
-    cursor:pointer;margin-bottom:50px;transition:background 0.3s;}
-.back-button:hover{background:#5a4435;}
-.hidden{display:none;}
-
-/* Chat Modal Styles */
-.chat-modal{display:none;position:fixed;bottom:100px;right:30px;width:350px;height:450px;background:#fff;
-    border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.3);overflow:hidden;flex-direction:column;z-index:2000;}
-.chat-header{background:#fdd835;padding:15px;font-weight:600;color:#3D2B1F;display:flex;justify-content:space-between;align-items:center;}
-.chat-header .close{cursor:pointer;font-size:22px;}
-.chat-body{flex:1;padding:15px;overflow-y:auto;background:#fafafa;font-size:0.9rem;color:#444;}
-.chat-footer{display:flex;border-top:1px solid #ddd;}
-.chat-footer input{flex:1;padding:12px;border:none;outline:none;}
-.chat-footer button{background:#3D2B1F;border:none;color:white;padding:0 18px;cursor:pointer;transition:background 0.3s;}
-.chat-footer button:hover{background:#5a4435;}
-
-footer a {
-  margin: 0 12px;              /* spacing between icons */
-  color: white;                /* default color */
-  font-size: 28px;             /* bigger icons */
-  transition: color 0.3s ease, transform 0.3s ease;
+.gallery-section p{
+    font-size:1.1rem;
+    max-width:800px;
+    margin:-30px auto 50px;
+    color:#5a4435;
 }
-
-footer a:hover {
-  color: #f1c40f;              /* gold highlight on hover */
-  transform: scale(1.2);       /* slight zoom on hover */
+.photo-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+    gap:20px;
+    max-width:1400px;
+    margin:0 auto;
+}
+.photo-grid a img{
+    width:100%;
+    height:250px;
+    object-fit:cover;
+    border-radius:10px;
+    transition:transform 0.3s,box-shadow 0.3s;
+}
+.photo-grid a:hover img{
+    transform:scale(1.05);
+    box-shadow:0 8px 25px rgba(0,0,0,0.15);
+}
+.back-button{
+    background:#3D2B1F;
+    color:#fff;
+    border:none;
+    padding:12px 25px;
+    border-radius:5px;
+    font-size:1rem;
+    cursor:pointer;
+    margin-bottom:50px;
+    transition:background 0.3s;
+}
+.back-button:hover{
+    background:#5a4435;
+}
+.hidden{
+    display:none;
 }
 </style>
 </head>
@@ -109,13 +125,13 @@ footer a:hover {
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About Us</a></li>
-        <li><a href="services.html">Services</a></li>
+      <li><a href="services.html">Services</a></li>
       <li><a href="projects.html">Projects</a></li>
       <li><a href="Products.html">Products</a></li>
     </ul>
     <div class="nav-right">
- <a href="https://www.solarpower.org/" class="fas fa-globe"></a>
-      <a href="Index.html" class="contact-btn">Contact Us</a>
+      <a href="https://www.solarpower.org/" class="fas fa-globe"></a>
+      <a href="#contact" class="contact-btn">Contact Us</a>
     </div>
   </nav>
 </header>
@@ -236,69 +252,47 @@ footer a:hover {
   </section>
 
 </main>
+
 <button class="chat-button" id="chatButton" aria-label="Open chat">
-        <svg viewBox="0 0 24 24">
-            <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
-        </svg>
-        <div class="chat-badge">!</div>
-    </button>
-
-    <div class="chat-overlay" id="chatOverlay"></div>
-
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header">
-            <div class="header-info">
-                <h3>Surya</h3>
-                <div class="status">
-                    <div class="status-dot"></div>
-                    Your AI Powered Assistant for solar related Queries
-                </div>
-            </div>
-            <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
-        </div>
-
-        <div class="chat-messages" id="chatMessages">
-            <div class="typing-indicator" id="typingIndicator">
-                <div class="typing-dots">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="chat-input">
-            <div class="input-wrapper">
-                <textarea 
-                    class="chat-textarea" 
-                    id="messageInput" 
-                    placeholder="Type your message..."
-                    rows="1"
-                ></textarea>
-            </div>
-            <button class="send-btn" id="sendBtn" aria-label="Send message">
-                <svg viewBox="0 0 24 24">
-                    <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                </svg>
-            </button>
-        </div>
-    </div>
-    <script src="chat.js"></script>
-<!-- <button class="chatbot-toggler" id="openModal">
-  <i class="fa-solid fa-comments"></i>
+  <svg viewBox="0 0 24 24">
+      <path d="M20 2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h4l4 4 4-4h4c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+  </svg>
+  <div class="chat-badge">!</div>
 </button>
 
-<div id="chatModal" class="chat-modal">
+<div class="chat-overlay" id="chatOverlay"></div>
+
+<div class="chat-modal" id="chatModal">
   <div class="chat-header">
-    <span>Comment Box</span>
-    <span class="close">&times;</span>
+      <div class="header-info">
+          <h3>Surya</h3>
+          <div class="status">
+              <div class="status-dot"></div>
+              Your AI Powered Assistant for solar related Queries
+          </div>
+      </div>
+      <button class="close-btn" id="closeBtn" aria-label="Close chat">&times;</button>
   </div>
-  <div class="chat-body" id="chatBody"></div>
-  <div class="chat-footer">
-    <input type="text" id="chatInput" placeholder="Type a comment..." />
-    <button id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+  <div class="chat-messages" id="chatMessages">
+      <div class="typing-indicator" id="typingIndicator">
+          <div class="typing-dots">
+              <span></span><span></span><span></span>
+          </div>
+      </div>
   </div>
-</div> -->
+  <div class="chat-input">
+      <div class="input-wrapper">
+          <textarea class="chat-textarea" id="messageInput" placeholder="Type your message..." rows="1"></textarea>
+      </div>
+      <button class="send-btn" id="sendBtn" aria-label="Send message">
+          <svg viewBox="0 0 24 24">
+              <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+          </svg>
+      </button>
+  </div>
+</div>
+
+<script src="chat.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox-plus-jquery.min.js"></script>
 
@@ -321,45 +315,48 @@ footer a:hover {
       });
       categoriesSection.classList.remove('hidden');
   }
-
-  // --- Chat Modal Logic ---
-  const chatModal = document.getElementById("chatModal");
-  const openBtn = document.getElementById("openModal");
-  const closeBtn = document.querySelector(".chat-header .close");
-  const chatBody = document.getElementById("chatBody");
-  const chatInput = document.getElementById("chatInput");
-  const sendBtn = document.getElementById("sendBtn");
-
-  openBtn.onclick = () => { chatModal.style.display = "flex"; }
-  closeBtn.onclick = () => { chatModal.style.display = "none"; }
-  window.onclick = (e) => { if (e.target == chatModal) chatModal.style.display = "none"; }
-
-  sendBtn.onclick = () => {
-    let msg = chatInput.value.trim();
-    if(msg){
-      let newMsg = document.createElement("div");
-      newMsg.textContent = msg;
-      newMsg.style.margin = "10px 0";
-      newMsg.style.padding = "8px 12px";
-      newMsg.style.background = "#eee";
-      newMsg.style.borderRadius = "10px";
-      chatBody.appendChild(newMsg);
-      chatInput.value = "";
-      chatBody.scrollTop = chatBody.scrollHeight;
-    }
-  };
 </script>
 
-<footer>
-  <p style="text-align: center; padding: 20px; background-color: #3D2B1F; color: white;">
-    <a href="https://www.instagram.com/sunrise_power_official" target="_blank" style="margin: 0 10px;"><i class="fab fa-instagram"></i></a>
-    <a href="https://wa.me/+919923138363" target="_blank" style="margin: 0 10px;"><i class="fab fa-whatsapp"></i></a>
-    <a href="https://www.facebook.com/profile.php?id=100090373153574" target="_blank" style="margin: 0 10px;"><i class="fab fa-facebook"></i></a>
-    <a href="https://www.youtube.com/@Sunrisepower2all" target="_blank" style="margin: 0 10px;"><i class="fab fa-youtube"></i></a>
-    <br><br>
-    © 2024 Sunrise Power. All rights reserved.
-  </p>
+<footer class="footer" id="contact">
+  <div class="footer-container">
+    <div class="footer-col">
+      <img src="Assets/sunrise power logo.png" height="50" alt="Sunrise Power Logo" style="margin-bottom: 10px;">
+      <h3>SUNRISE POWER</h3>
+      <p>Empowering Maharashtra with reliable and sustainable solar energy solutions. Specializing in residential, commercial, and industrial solar installations since 2012.</p>
+      <div class="social-icons">
+        <a href="https://www.facebook.com/profile.php?id=100090373153574" target="_blank"><i class="fab fa-facebook"></i></a>
+        <a href="https://www.instagram.com/sunrise_power_official" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://wa.me/+919923138363" target="_blank"><i class="fab fa-whatsapp"></i></a>
+        <a href="https://www.youtube.com/@Sunrisepower2all" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://www.linkedin.com/" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Our Services</h4>
+      <ul>
+        <li>Solar Installations</li>
+        <li>Annual Maintenance Contracts</li>
+        <li>Consultation Services</li>
+        <li>Custom Solar Solutions</li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="Index.html">Home</a></li>
+        <li><a href="About.html">About Us</a></li>
+        <li><a href="services.html">Services</a></li>
+        <li><a href="Projects.html">Projects</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Contact Us</h4>
+      <p><i class="fas fa-map-marker-alt"></i> 53B, Canal Bypass Road, Nomaniya Nagar, Taroda BK, Nanded-431605</p><br>
+      <p><i class="fas fa-phone"></i> +91-9923138363 / 8329205927</p><br>
+      <p><i class="fas fa-envelope"></i> sunrisepower2all@gmail.com</p>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2025 SUNRISE POWER. All rights reserved.</div>
 </footer>
 </body>
 </html>
-
