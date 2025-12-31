@@ -46,8 +46,8 @@ CSRF_COOKIE_HTTPONLY = True
 
 # CSRF Trusted Origins (add your domain)
 CSRF_TRUSTED_ORIGINS = [
-    'https://*.onrender.com',
-    'https://*.pythonanywhere.com',
+    'https://sunrisepower.onrender.com',
+    # 'https://*.pythonanywhere.com',
 ]
 
 # CORS Settings for production
@@ -65,6 +65,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', 'noreply@sunrisepower.com')
+
+LOG_DIR = os.path.join(BASE_DIR, "logs")
+os.makedirs(LOG_DIR, exist_ok=True)
+
 
 # Logging Configuration
 LOGGING = {
@@ -120,7 +124,7 @@ CACHES = {
 }
 
 # Session Configuration
-SESSION_ENGINE = 'django.contrib.sessions.backends.cached_db'
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_CACHE_ALIAS = 'default'
 
 # Performance Settings
@@ -155,5 +159,7 @@ ADMIN_URL = os.environ.get('ADMIN_URL', 'admin/')
 RATELIMIT_ENABLE = True
 
 # Compression
-COMPRESS_ENABLED = True
-COMPRESS_OFFLINE = True
+if 'compressor' in INSTALLED_APPS:
+    COMPRESS_ENABLED = True
+    COMPRESS_OFFLINE = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
