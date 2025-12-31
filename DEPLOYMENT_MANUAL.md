@@ -20,9 +20,6 @@ solar-crm-platform/
 │   ├── static/              # Admin interface static files
 │   └── manage.py            # Django management script
 └── DEPLOYMENT_MANUAL.md     # This file
-```
-
----
 
 ## 🔧 Installation & Setup
 

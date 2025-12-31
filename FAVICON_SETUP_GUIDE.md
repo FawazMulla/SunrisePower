@@ -21,7 +21,6 @@ Favicons are small icons that appear in browser tabs, bookmarks, and mobile home
 - **192x192px** - Android Chrome
 - **196x196px** - Android Chrome
 - **512x512px** - Android Chrome (high resolution)
-
 ### File Formats
 - **ICO** - Traditional favicon format (supports multiple sizes)
 - **PNG** - Modern format with transparency support

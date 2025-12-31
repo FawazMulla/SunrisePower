@@ -43,7 +43,20 @@ if settings.DEBUG:
     assets_path = frontend_dir / 'Assets'
     
     urlpatterns += [
+        # Serve Assets folder
         re_path(r'^Assets/(?P<path>.*)$', serve, {
             'document_root': str(assets_path),
+        }),
+        # Serve CSS files
+        re_path(r'^(?P<path>.*\.css)$', serve, {
+            'document_root': str(frontend_dir),
+        }),
+        # Serve JS files
+        re_path(r'^(?P<path>.*\.js)$', serve, {
+            'document_root': str(frontend_dir),
+        }),
+        # Serve other frontend files (PDF, etc.)
+        re_path(r'^(?P<path>.*\.(pdf|txt|ico))$', serve, {
+            'document_root': str(frontend_dir),
         }),
     ]

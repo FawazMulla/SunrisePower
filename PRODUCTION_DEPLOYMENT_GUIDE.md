@@ -16,7 +16,7 @@ This guide covers deploying the Solar CRM Platform to production environments, s
 - [ ] `runtime.txt` (Python version specification)
 - [ ] `build.sh` (for Render deployment)
 - [ ] Production settings file
-- [ ] Environment variables configuration
+- [ ] Environment variables configuration   
 
 ---
 
@@ -59,7 +59,6 @@ Add production-specific dependencies:
 Django==4.2.7
 djangorestframework==3.14.0
 
-# Database
 psycopg2-binary==2.9.9
 
 # Environment and Configuration
@@ -72,7 +71,7 @@ django-cors-headers==4.3.1
 # Authentication and Security
 PyJWT==2.8.0
 cryptography>=41.0.0
-
+    
 # Production Server
 gunicorn==21.2.0
 

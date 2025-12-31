@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Solar CRM Admin{% endblock %}</title>
     
+    <!-- Favicon Links -->
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="{% static 'admin/img/favicon/favicon.ico' %}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'admin/img/favicon/icon-16x16.png' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'admin/img/favicon/icon-32x32.png' %}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'admin/img/favicon/apple-touch-icon.png' %}">
+    <meta name="theme-color" content="#3D2B1F">
+    
     <!-- Google Fonts - Poppins (same as website) -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
@@ -12,7 +20,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Admin Base CSS -->
-    {% load static %}
     <link rel="stylesheet" href="{% static 'admin/css/admin-base.css' %}">
     
     <!-- Additional CSS -->

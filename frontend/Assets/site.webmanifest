@@ -1,0 +1,22 @@
+{
+    "name": "Sunrise Power",
+    "short_name": "Sunrise Power",
+    "description": "Solar energy solutions for residential and commercial properties in Maharashtra",
+    "icons": [
+        {
+            "src": "Assets/favicons/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "Assets/favicons/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#fdd835",
+    "background_color": "#fcf8f0",
+    "display": "standalone",
+    "start_url": "/",
+    "scope": "/"
+}

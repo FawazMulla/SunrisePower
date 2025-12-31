@@ -6,7 +6,8 @@ import sys
 
 def main():
     """Run administrative tasks."""
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "solar_crm.settings.development")
+    # Use production settings by default, can be overridden with environment variable
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "solar_crm.settings.production")
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -1,0 +1,47 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{{ title }} | Solar CRM Admin{% endblock %}
+
+{% block branding %}
+<h1 id="site-name">
+    <a href="{% url 'admin:index' %}">
+        <img src="{% static 'sunrise power logo.png' %}" alt="Sunrise Power" height="30" style="margin-right: 10px;">
+        Solar CRM Admin
+    </a>
+</h1>
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<!-- Favicon Links for Django Admin -->
+<link rel="icon" type="image/x-icon" href="{% static 'admin/img/favicon/favicon.ico' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'admin/img/favicon/icon-16x16.png' %}">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'admin/img/favicon/icon-32x32.png' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'admin/img/favicon/apple-touch-icon.png' %}">
+<meta name="theme-color" content="#3D2B1F">
+
+<!-- Custom admin styling -->
+<style>
+    #site-name a {
+        color: #fdd835;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+    }
+    #site-name a:hover {
+        color: #ffeb7b;
+    }
+    .module h2, .module caption, .inline-group h2 {
+        background: #3D2B1F;
+    }
+    .button, input[type=submit], input[type=button], .submit-row input, a.button {
+        background: #fdd835;
+        color: #3D2B1F;
+        border: none;
+    }
+    .button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+        background: #ffeb7b;
+    }
+</style>
+{% endblock %}
