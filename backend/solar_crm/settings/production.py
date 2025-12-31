@@ -1,7 +1,7 @@
 """
 Production settings for Solar CRM Platform
 """
-
+import logging
 from .base import *
 import os
 
