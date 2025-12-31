@@ -1,0 +1,269 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+{% if object %}Edit Customer - {{ object.first_name }} {{ object.last_name }}{% else %}Add New Customer{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-{% if object %}edit{% else %}plus{% endif %}"></i>
+            {% if object %}Edit Customer{% else %}Add New Customer{% endif %}
+        </h1>
+        <p class="subtitle">
+            {% if object %}Update customer information and details{% else %}Create a new customer in the system{% endif %}
+        </p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Form Sections -->
+            <div class="form-grid">
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Basic Information</h3>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_first_name">
+                                First Name <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-user"></i>
+                                {{ form.first_name }}
+                            </div>
+                            {% if form.first_name.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_last_name">
+                                Last Name
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-user"></i>
+                                {{ form.last_name }}
+                            </div>
+                            {% if form.last_name.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_email">
+                                Email Address <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-envelope"></i>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_phone">
+                                Phone Number <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-phone"></i>
+                                {{ form.phone }}
+                            </div>
+                            {% if form.phone.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.phone.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Company Information Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-building"></i> Company Information</h3>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_company_name">
+                            Company Name
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="input-icon fas fa-building"></i>
+                            {{ form.company_name }}
+                        </div>
+                        {% if form.company_name.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.company_name.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_customer_type">
+                                Customer Type
+                            </label>
+                            <div class="select-enhanced">
+                                {{ form.customer_type }}
+                            </div>
+                            {% if form.customer_type.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.customer_type.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_status">
+                                Status
+                            </label>
+                            <div class="select-enhanced">
+                                {{ form.status }}
+                            </div>
+                            {% if form.status.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.status.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Information Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_address">
+                            Address
+                        </label>
+                        <div class="textarea-enhanced">
+                            {{ form.address }}
+                        </div>
+                        {% if form.address.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.address.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-grid-3">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_city">
+                                City
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-city"></i>
+                                {{ form.city }}
+                            </div>
+                            {% if form.city.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.city.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_state">
+                                State
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-map"></i>
+                                {{ form.state }}
+                            </div>
+                            {% if form.state.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.state.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_pincode">
+                                PIN Code
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-mail-bulk"></i>
+                                {{ form.pincode }}
+                            </div>
+                            {% if form.pincode.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.pincode.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{% if object %}{% url 'admin_interface:customer_detail' object.pk %}{% else %}{% url 'admin_interface:customers' %}{% endif %}" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 
+                    {% if object %}Update Customer{% else %}Create Customer{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Form Validation Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    
+    form.addEventListener('submit', function(event) {
+        if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+    });
+    
+    // Auto-format phone number
+    const phoneInput = document.getElementById('id_phone');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function(e) {
+            // Allow + sign at the beginning
+            let value = e.target.value.replace(/[^\d\+\-\s\(\)]/g, '');
+            e.target.value = value;
+        });
+    }
+});
+</script>
+{% endblock %}

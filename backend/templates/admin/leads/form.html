@@ -211,7 +211,7 @@
 
             <!-- Form Actions -->
             <div class="form-actions">
-                <a href="{% if object %}{% url 'admin:lead_detail' object.pk %}{% else %}{% url 'admin:leads' %}{% endif %}" 
+                <a href="{% if object %}{% url 'admin_interface:lead_detail' object.pk %}{% else %}{% url 'admin_interface:leads' %}{% endif %}" 
                    class="btn btn-secondary">
                     <i class="fas fa-times"></i> Cancel
                 </a>

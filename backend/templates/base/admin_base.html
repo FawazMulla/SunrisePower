@@ -23,25 +23,25 @@
     <header class="admin-header">
         <nav class="admin-navbar">
             <div class="admin-logo">
-                <a href="{% url 'admin:dashboard' %}">
+                <a href="{% url 'admin_interface:dashboard' %}">
                     <img src="{% static 'sunrise power logo.png' %}" alt="Sunrise Power">
                 </a>
             </div>
             
             <ul class="admin-nav-links">
-                <li><a href="{% url 'admin:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                <li><a href="{% url 'admin_interface:dashboard' %}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a></li>
-                <li><a href="{% url 'admin:leads' %}" class="{% if 'leads' in request.resolver_match.url_name %}active{% endif %}">
+                <li><a href="{% url 'admin_interface:leads' %}" class="{% if 'leads' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-user-plus"></i> Leads
                 </a></li>
-                <li><a href="{% url 'admin:customers' %}" class="{% if 'customers' in request.resolver_match.url_name %}active{% endif %}">
+                <li><a href="{% url 'admin_interface:customers' %}" class="{% if 'customers' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-users"></i> Customers
                 </a></li>
-                <li><a href="{% url 'admin:services' %}" class="{% if 'services' in request.resolver_match.url_name %}active{% endif %}">
+                <li><a href="{% url 'admin_interface:services' %}" class="{% if 'services' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-tools"></i> Services
                 </a></li>
-                <li><a href="{% url 'admin:analytics' %}" class="{% if 'analytics' in request.resolver_match.url_name %}active{% endif %}">
+                <li><a href="{% url 'admin_interface:analytics' %}" class="{% if 'analytics' in request.resolver_match.url_name %}active{% endif %}">
                     <i class="fas fa-chart-bar"></i> Analytics
                 </a></li>
             </ul>
@@ -52,14 +52,14 @@
                         <i class="fas fa-user-circle"></i>
                         {{ user.get_full_name|default:user.username }}
                     </span>
-                    <form method="post" action="{% url 'admin:logout' %}" style="display: inline;">
+                    <form method="post" action="{% url 'admin_interface:logout' %}" style="display: inline;">
                         {% csrf_token %}
                         <button type="submit" class="admin-logout-btn">
                             <i class="fas fa-sign-out-alt"></i> Logout
                         </button>
                     </form>
                 {% else %}
-                    <a href="{% url 'admin:login' %}" class="btn btn-primary">
+                    <a href="{% url 'admin_interface:login' %}" class="btn btn-primary">
                         <i class="fas fa-sign-in-alt"></i> Login
                     </a>
                 {% endif %}
@@ -87,7 +87,7 @@
     <footer class="admin-footer">
         <p>&copy; {% now "Y" %} Sunrise Power. All rights reserved. | 
            <a href="mailto:info@sunrisepower.com">Contact Support</a> | 
-           <a href="{% url 'admin:dashboard' %}">Admin Dashboard</a>
+           <a href="{% url 'admin_interface:dashboard' %}">Admin Dashboard</a>
         </p>
     </footer>
 

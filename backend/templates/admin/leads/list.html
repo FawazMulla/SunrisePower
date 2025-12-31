@@ -54,7 +54,7 @@
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-search"></i> Search
                     </button>
-                    <a href="{% url 'admin:leads' %}" class="btn btn-secondary">
+                    <a href="{% url 'admin_interface:leads' %}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Clear
                     </a>
                 </div>
@@ -67,8 +67,12 @@
         <div>
             <span class="text-muted">{{ paginator.count }} lead{{ paginator.count|pluralize }} found</span>
         </div>
-        <div>
-            <a href="{% url 'admin:lead_create' %}" class="btn btn-primary">
+        <div class="d-flex gap-2">
+            <a href="{% url 'admin_interface:export_leads' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}" 
+               class="btn btn-success">
+                <i class="fas fa-download"></i> Export CSV
+            </a>
+            <a href="{% url 'admin_interface:lead_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add New Lead
             </a>
         </div>
@@ -150,14 +154,14 @@
                     </td>
                     <td>
                         <div class="d-flex gap-1">
-                            <a href="{% url 'admin:lead_detail' lead.pk %}" class="btn btn-sm btn-secondary" title="View Details">
+                            <a href="{% url 'admin_interface:lead_detail' lead.pk %}" class="btn btn-sm btn-secondary" title="View Details">
                                 <i class="fas fa-eye"></i>
                             </a>
-                            <a href="{% url 'admin:lead_edit' lead.pk %}" class="btn btn-sm btn-primary" title="Edit">
+                            <a href="{% url 'admin_interface:lead_edit' lead.pk %}" class="btn btn-sm btn-primary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
                             {% if lead.status != 'converted' %}
-                            <form method="post" action="{% url 'admin:lead_convert' lead.pk %}" style="display: inline;">
+                            <form method="post" action="{% url 'admin_interface:lead_convert' lead.pk %}" style="display: inline;">
                                 {% csrf_token %}
                                 <button type="submit" class="btn btn-sm btn-success" title="Convert to Customer" 
                                         onclick="return confirm('Convert this lead to a customer?')">
@@ -165,7 +169,7 @@
                                 </button>
                             </form>
                             {% endif %}
-                            <a href="{% url 'admin:lead_delete' lead.pk %}" class="btn btn-sm btn-danger" 
+                            <a href="{% url 'admin_interface:lead_delete' lead.pk %}" class="btn btn-sm btn-danger" 
                                title="Delete" data-confirm-delete>
                                 <i class="fas fa-trash"></i>
                             </a>
@@ -180,7 +184,7 @@
             <i class="fas fa-user-plus" style="font-size: 3rem; color: #ddd; margin-bottom: 20px;"></i>
             <h3>No leads found</h3>
             <p class="text-muted">No leads match your current filters.</p>
-            <a href="{% url 'admin:lead_create' %}" class="btn btn-primary">
+            <a href="{% url 'admin_interface:lead_create' %}" class="btn btn-primary">
                 <i class="fas fa-plus"></i> Add Your First Lead
             </a>
         </div>

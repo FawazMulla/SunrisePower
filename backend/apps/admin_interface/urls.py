@@ -5,7 +5,7 @@ from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
 
-app_name = 'admin'
+app_name = 'admin_interface'
 
 urlpatterns = [
     # Authentication
@@ -44,4 +44,9 @@ urlpatterns = [
     # API endpoints for AJAX calls
     path('api/dashboard-metrics/', views.DashboardMetricsAPIView.as_view(), name='dashboard_metrics_api'),
     path('api/chart-data/<str:chart_type>/', views.ChartDataAPIView.as_view(), name='chart_data_api'),
+    
+    # Export endpoints
+    path('export/leads/', views.ExportLeadsView.as_view(), name='export_leads'),
+    path('export/customers/', views.ExportCustomersView.as_view(), name='export_customers'),
+    path('export/services/', views.ExportServiceRequestsView.as_view(), name='export_services'),
 ]

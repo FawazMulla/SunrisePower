@@ -17,10 +17,10 @@
 
     <!-- Action Buttons -->
     <div class="d-flex gap-2 mb-3">
-        <a href="{% url 'admin:services' %}" class="btn btn-secondary">
+        <a href="{% url 'admin_interface:services' %}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Services
         </a>
-        <a href="{% url 'admin:service_edit' service_request.pk %}" class="btn btn-primary">
+        <a href="{% url 'admin_interface:service_edit' service_request.pk %}" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit Request
         </a>
         {% if service_request.status != 'resolved' and service_request.status != 'closed' %}
@@ -33,7 +33,7 @@
             <i class="fas fa-archive"></i> Close Ticket
         </button>
         {% endif %}
-        <a href="{% url 'admin:service_delete' service_request.pk %}" class="btn btn-danger" data-confirm-delete>
+        <a href="{% url 'admin_interface:service_delete' service_request.pk %}" class="btn btn-danger" data-confirm-delete>
             <i class="fas fa-trash"></i> Delete Request
         </a>
     </div>
@@ -145,7 +145,7 @@
             <div class="form-group">
                 <label class="form-label">Customer Name</label>
                 <div class="form-control" readonly>
-                    <a href="{% url 'admin:customer_detail' service_request.customer.pk %}">
+                    <a href="{% url 'admin_interface:customer_detail' service_request.customer.pk %}">
                         {{ service_request.customer.lead.first_name }} {{ service_request.customer.lead.last_name }}
                     </a>
                 </div>
@@ -162,7 +162,7 @@
             <div class="form-group">
                 <label class="form-label">Customer</label>
                 <div class="form-control" readonly>
-                    <a href="{% url 'admin:customer_detail' service_request.customer.pk %}">
+                    <a href="{% url 'admin_interface:customer_detail' service_request.customer.pk %}">
                         Customer #{{ service_request.customer.id }}
                     </a>
                 </div>
@@ -308,7 +308,7 @@
                 <span>Call Customer</span>
             </a>
             
-            <a href="{% url 'admin:customer_detail' service_request.customer.pk %}" class="quick-action-btn">
+            <a href="{% url 'admin_interface:customer_detail' service_request.customer.pk %}" class="quick-action-btn">
                 <i class="fas fa-user"></i>
                 <span>View Customer</span>
             </a>
@@ -328,7 +328,7 @@ function updateStatus(status) {
     if (confirm(`Mark this service request as ${status}?`)) {
         // This would typically make an AJAX call to update the status
         // For now, we'll redirect to the edit page
-        window.location.href = `{% url 'admin:service_edit' service_request.pk %}`;
+        window.location.href = `{% url 'admin_interface:service_edit' service_request.pk %}`;
     }
 }
 

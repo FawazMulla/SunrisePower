@@ -270,7 +270,7 @@
                 <span>Export Service Report</span>
             </button>
             
-            <a href="{% url 'admin:reports' %}" class="quick-action-btn">
+            <a href="{% url 'admin_interface:reports' %}" class="quick-action-btn">
                 <i class="fas fa-chart-pie"></i>
                 <span>Detailed Reports</span>
             </a>
@@ -581,7 +581,7 @@ function initializeMonthlyComparisonChart() {
 
 function updateChart(chartType, period) {
     // Fetch new data based on chart type and period
-    fetch(`{% url 'admin:chart_data_api' 'analytics' %}?chart=${chartType}&period=${period}`)
+    fetch(`{% url 'admin_interface:chart_data_api' 'analytics' %}?chart=${chartType}&period=${period}`)
         .then(response => response.json())
         .then(data => {
             // Update the appropriate chart with new data

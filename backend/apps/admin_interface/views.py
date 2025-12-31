@@ -8,11 +8,12 @@ from django.views.generic import (
 )
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.urls import reverse_lazy
 from django.db.models import Count, Sum, Q
 from django.utils import timezone
 from datetime import datetime, timedelta
+import csv
 
 from apps.leads.models import Lead, LeadSource
 from apps.customers.models import Customer
@@ -22,7 +23,7 @@ from apps.analytics.models import AnalyticsMetric, ConversionFunnel, RevenueTrac
 
 class AdminRequiredMixin(LoginRequiredMixin):
     """Mixin to ensure user is authenticated and has admin access"""
-    login_url = reverse_lazy('admin:login')
+    login_url = reverse_lazy('admin_interface:login')
     
     def dispatch(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -116,7 +117,7 @@ class LeadsListView(AdminRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         context.update({
             'lead_sources': LeadSource.objects.all(),
-            'status_choices': Lead.STATUS_CHOICES,
+            'status_choices': Lead.LEAD_STATUS_CHOICES,
             'current_filters': {
                 'status': self.request.GET.get('status', ''),
                 'source': self.request.GET.get('source', ''),
@@ -145,7 +146,7 @@ class LeadCreateView(AdminRequiredMixin, CreateView):
         'property_type', 'estimated_capacity', 'budget_range',
         'interest_level', 'status'
     ]
-    success_url = reverse_lazy('admin:leads')
+    success_url = reverse_lazy('admin_interface:leads')
     
     def form_valid(self, form):
         messages.success(self.request, 'Lead created successfully!')
@@ -161,7 +162,7 @@ class LeadUpdateView(AdminRequiredMixin, UpdateView):
         'property_type', 'estimated_capacity', 'budget_range',
         'interest_level', 'status'
     ]
-    success_url = reverse_lazy('admin:leads')
+    success_url = reverse_lazy('admin_interface:leads')
     
     def form_valid(self, form):
         messages.success(self.request, 'Lead updated successfully!')
@@ -176,7 +177,7 @@ class LeadConvertView(AdminRequiredMixin, View):
         
         if lead.converted_at:
             messages.warning(request, 'Lead has already been converted!')
-            return redirect('admin:lead_detail', pk=pk)
+            return redirect('admin_interface:lead_detail', pk=pk)
         
         # Create customer from lead
         customer = Customer.objects.create(
@@ -191,14 +192,14 @@ class LeadConvertView(AdminRequiredMixin, View):
         lead.save()
         
         messages.success(request, f'Lead converted to customer successfully!')
-        return redirect('admin:customer_detail', pk=customer.pk)
+        return redirect('admin_interface:customer_detail', pk=customer.pk)
 
 
 class LeadDeleteView(AdminRequiredMixin, DeleteView):
     """Delete lead"""
     model = Lead
     template_name = 'admin/leads/delete.html'
-    success_url = reverse_lazy('admin:leads')
+    success_url = reverse_lazy('admin_interface:leads')
     
     def delete(self, request, *args, **kwargs):
         messages.success(request, 'Lead deleted successfully!')
@@ -256,10 +257,15 @@ class CustomerCreateView(AdminRequiredMixin, CreateView):
     model = Customer
     template_name = 'admin/customers/form.html'
     fields = [
+        'first_name', 'last_name', 'email', 'phone',
         'company_name', 'address', 'city', 'state', 'pincode',
         'customer_type', 'status'
     ]
-    success_url = reverse_lazy('admin:customers')
+    success_url = reverse_lazy('admin_interface:customers')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Customer created successfully!')
+        return super().form_valid(form)
 
 
 class CustomerUpdateView(AdminRequiredMixin, UpdateView):
@@ -267,17 +273,22 @@ class CustomerUpdateView(AdminRequiredMixin, UpdateView):
     model = Customer
     template_name = 'admin/customers/form.html'
     fields = [
+        'first_name', 'last_name', 'email', 'phone',
         'company_name', 'address', 'city', 'state', 'pincode',
         'customer_type', 'status'
     ]
-    success_url = reverse_lazy('admin:customers')
+    success_url = reverse_lazy('admin_interface:customers')
+    
+    def form_valid(self, form):
+        messages.success(self.request, 'Customer updated successfully!')
+        return super().form_valid(form)
 
 
 class CustomerDeleteView(AdminRequiredMixin, DeleteView):
     """Delete customer"""
     model = Customer
     template_name = 'admin/customers/delete.html'
-    success_url = reverse_lazy('admin:customers')
+    success_url = reverse_lazy('admin_interface:customers')
 
 
 class ServiceRequestsListView(AdminRequiredMixin, ListView):
@@ -325,7 +336,7 @@ class ServiceRequestCreateView(AdminRequiredMixin, CreateView):
         'customer', 'request_type', 'priority', 'subject',
         'description', 'status', 'assigned_to'
     ]
-    success_url = reverse_lazy('admin:services')
+    success_url = reverse_lazy('admin_interface:services')
 
 
 class ServiceRequestUpdateView(AdminRequiredMixin, UpdateView):
@@ -336,14 +347,14 @@ class ServiceRequestUpdateView(AdminRequiredMixin, UpdateView):
         'request_type', 'priority', 'subject', 'description',
         'status', 'assigned_to'
     ]
-    success_url = reverse_lazy('admin:services')
+    success_url = reverse_lazy('admin_interface:services')
 
 
 class ServiceRequestDeleteView(AdminRequiredMixin, DeleteView):
     """Delete service request"""
     model = ServiceRequest
     template_name = 'admin/services/delete.html'
-    success_url = reverse_lazy('admin:services')
+    success_url = reverse_lazy('admin_interface:services')
 
 
 class AnalyticsView(AdminRequiredMixin, TemplateView):
@@ -450,3 +461,172 @@ class ChartDataAPIView(AdminRequiredMixin, View):
             'labels': ['Open', 'In Progress', 'Resolved', 'Closed'],
             'data': [15, 8, 12, 25]
         }
+
+
+# Export Views
+class ExportLeadsView(AdminRequiredMixin, View):
+    """Export leads to CSV"""
+    
+    def get(self, request):
+        # Create the HttpResponse object with CSV header
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="leads_export.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Write CSV header
+        writer.writerow([
+            'ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Source',
+            'Status', 'Interest Level', 'Property Type', 'Estimated Capacity (kW)',
+            'Budget Range', 'Score', 'Priority Level', 'Address', 'City', 'State',
+            'Pincode', 'Assigned To', 'Created At', 'Last Contacted', 'Notes'
+        ])
+        
+        # Get filtered leads based on request parameters
+        leads = Lead.objects.select_related('source', 'assigned_to').all()
+        
+        # Apply filters if provided
+        status = request.GET.get('status')
+        source = request.GET.get('source')
+        if status:
+            leads = leads.filter(status=status)
+        if source:
+            leads = leads.filter(source_id=source)
+        
+        # Write data rows
+        for lead in leads:
+            writer.writerow([
+                lead.id,
+                lead.first_name,
+                lead.last_name,
+                lead.email,
+                lead.phone,
+                lead.source.name,
+                lead.get_status_display(),
+                lead.get_interest_level_display(),
+                lead.get_property_type_display(),
+                lead.estimated_capacity or '',
+                lead.get_budget_range_display(),
+                lead.score,
+                lead.get_priority_level_display(),
+                lead.address,
+                lead.city,
+                lead.state,
+                lead.pincode,
+                lead.assigned_to.get_full_name() if lead.assigned_to else '',
+                lead.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                lead.last_contacted_at.strftime('%Y-%m-%d %H:%M:%S') if lead.last_contacted_at else '',
+                lead.notes
+            ])
+        
+        return response
+
+
+class ExportCustomersView(AdminRequiredMixin, View):
+    """Export customers to CSV"""
+    
+    def get(self, request):
+        # Create the HttpResponse object with CSV header
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="customers_export.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Write CSV header
+        writer.writerow([
+            'ID', 'First Name', 'Last Name', 'Email', 'Phone', 'Company Name',
+            'Customer Type', 'Status', 'Address', 'City', 'State', 'Pincode',
+            'Lead Source', 'Created At', 'Total Projects', 'Total Revenue'
+        ])
+        
+        # Get filtered customers
+        customers = Customer.objects.select_related('lead__source').prefetch_related('service_requests').all()
+        
+        # Apply filters if provided
+        status = request.GET.get('status')
+        customer_type = request.GET.get('customer_type')
+        if status:
+            customers = customers.filter(status=status)
+        if customer_type:
+            customers = customers.filter(customer_type=customer_type)
+        
+        # Write data rows
+        for customer in customers:
+            # Calculate total projects and revenue
+            service_requests = customer.service_requests.all()
+            total_projects = service_requests.count()
+            total_revenue = sum(sr.total_amount or 0 for sr in service_requests)
+            
+            writer.writerow([
+                customer.id,
+                customer.first_name,
+                customer.last_name,
+                customer.email,
+                customer.phone,
+                customer.company_name or '',
+                customer.get_customer_type_display(),
+                customer.get_status_display(),
+                customer.address,
+                customer.city,
+                customer.state,
+                customer.pincode,
+                customer.lead.source.name if customer.lead and customer.lead.source else 'Direct',
+                customer.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                total_projects,
+                f"₹{total_revenue:,.2f}"
+            ])
+        
+        return response
+
+
+class ExportServiceRequestsView(AdminRequiredMixin, View):
+    """Export service requests to CSV"""
+    
+    def get(self, request):
+        # Create the HttpResponse object with CSV header
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="service_requests_export.csv"'
+        
+        writer = csv.writer(response)
+        
+        # Write CSV header
+        writer.writerow([
+            'ID', 'Customer Name', 'Customer Email', 'Service Type', 'Status',
+            'Priority', 'Description', 'Estimated Cost', 'Total Amount',
+            'Installation Date', 'Completion Date', 'Assigned To',
+            'Created At', 'Updated At'
+        ])
+        
+        # Get filtered service requests
+        service_requests = ServiceRequest.objects.select_related(
+            'customer', 'assigned_to'
+        ).all()
+        
+        # Apply filters if provided
+        status = request.GET.get('status')
+        service_type = request.GET.get('service_type')
+        if status:
+            service_requests = service_requests.filter(status=status)
+        if service_type:
+            service_requests = service_requests.filter(service_type=service_type)
+        
+        # Write data rows
+        for sr in service_requests:
+            writer.writerow([
+                sr.id,
+                sr.customer.full_name,
+                sr.customer.email,
+                sr.get_service_type_display(),
+                sr.get_status_display(),
+                sr.get_priority_display(),
+                sr.description,
+                f"₹{sr.estimated_cost:,.2f}" if sr.estimated_cost else '',
+                f"₹{sr.total_amount:,.2f}" if sr.total_amount else '',
+                sr.installation_date.strftime('%Y-%m-%d') if sr.installation_date else '',
+                sr.completion_date.strftime('%Y-%m-%d') if sr.completion_date else '',
+                sr.assigned_to.get_full_name() if sr.assigned_to else '',
+                sr.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                sr.updated_at.strftime('%Y-%m-%d %H:%M:%S')
+            ])
+        
+        return response

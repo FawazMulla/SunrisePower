@@ -17,14 +17,14 @@
 
     <!-- Action Buttons -->
     <div class="d-flex gap-2 mb-3">
-        <a href="{% url 'admin:leads' %}" class="btn btn-secondary">
+        <a href="{% url 'admin_interface:leads' %}" class="btn btn-secondary">
             <i class="fas fa-arrow-left"></i> Back to Leads
         </a>
-        <a href="{% url 'admin:lead_edit' lead.pk %}" class="btn btn-primary">
+        <a href="{% url 'admin_interface:lead_edit' lead.pk %}" class="btn btn-primary">
             <i class="fas fa-edit"></i> Edit Lead
         </a>
         {% if lead.status != 'converted' %}
-        <form method="post" action="{% url 'admin:lead_convert' lead.pk %}" style="display: inline;">
+        <form method="post" action="{% url 'admin_interface:lead_convert' lead.pk %}" style="display: inline;">
             {% csrf_token %}
             <button type="submit" class="btn btn-success" 
                     onclick="return confirm('Convert this lead to a customer?')">
@@ -32,7 +32,7 @@
             </button>
         </form>
         {% endif %}
-        <a href="{% url 'admin:lead_delete' lead.pk %}" class="btn btn-danger" data-confirm-delete>
+        <a href="{% url 'admin_interface:lead_delete' lead.pk %}" class="btn btn-danger" data-confirm-delete>
             <i class="fas fa-trash"></i> Delete Lead
         </a>
     </div>
