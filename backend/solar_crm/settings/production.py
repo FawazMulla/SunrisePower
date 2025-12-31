@@ -131,7 +131,9 @@ SESSION_CACHE_ALIAS = 'default'
 CONN_MAX_AGE = 60
 
 # Sentry Error Tracking (optional)
-if os.environ.get('SENTRY_DSN'):
+SENTRY_DSN = os.environ.get("SENTRY_DSN", "").strip()
+
+if SENTRY_DSN:
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
     from sentry_sdk.integrations.logging import LoggingIntegration
@@ -142,15 +144,16 @@ if os.environ.get('SENTRY_DSN'):
     )
 
     sentry_sdk.init(
-        dsn=os.environ.get('SENTRY_DSN'),
+        dsn=SENTRY_DSN,
         integrations=[
             DjangoIntegration(),
             sentry_logging,
         ],
         traces_sample_rate=0.1,
         send_default_pii=True,
-        environment='production'
+        environment="production",
     )
+
 
 # Admin Configuration
 ADMIN_URL = os.environ.get('ADMIN_URL', 'admin/')
