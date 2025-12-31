@@ -11,11 +11,9 @@ Copy the generated SECRET_KEY for use in environment variables.
 ### Step 2: Choose Deployment Platform
 
 #### Option A: Render (Recommended)
-
 1. **Create Render Account**
    - Go to [render.com](https://render.com)
    - Sign up with GitHub
-
 2. **Create Web Service** (No separate database needed - SQLite3 is included)
    - Click "New +" → "Web Service"
    - Connect your GitHub repository
