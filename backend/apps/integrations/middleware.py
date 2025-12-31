@@ -250,7 +250,10 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
                     "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
                     "img-src 'self' data: https:; "
                     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-                    "connect-src 'self' https://api.cohere.ai https://api.emailjs.com https://cdnjs.cloudflare.com;"
+                    "connect-src 'self' https://api.cohere.ai https://api.emailjs.com https://cdnjs.cloudflare.com; "
+                    "worker-src 'self' blob:; "
+                    "child-src 'self' blob:; "
+                    "manifest-src 'self';"
                 )
             
         except Exception as e:

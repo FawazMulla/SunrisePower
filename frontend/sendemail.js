@@ -38,12 +38,20 @@ async function sendFormDataToCRM(formData) {
       source: 'website_form'
     };
 
+    // Try to get CSRF token
+    const csrfToken = getCSRFToken();
+    const headers = {
+      'Content-Type': 'application/json'
+    };
+    
+    // Only add CSRF token if we have one
+    if (csrfToken) {
+      headers['X-CSRFToken'] = csrfToken;
+    }
+
     const response = await fetch('/api/integrations/webhooks/emailjs/', {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': getCSRFToken()
-      },
+      headers: headers,
       body: JSON.stringify(crmData)
     });
 

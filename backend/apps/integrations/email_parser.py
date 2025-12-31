@@ -101,19 +101,39 @@ class EmailParser:
     def _extract_email_data(self, webhook_data: Dict[str, Any]) -> Dict[str, Any]:
         """Extract email data from webhook payload."""
         try:
-            # EmailJS webhook structure may vary, adapt as needed
-            email_data = {
-                'email_id': webhook_data.get('email_id', f"emailjs_{int(datetime.now().timestamp())}"),
-                'sender_email': webhook_data.get('from_email', webhook_data.get('email', '')),
-                'sender_name': webhook_data.get('from_name', webhook_data.get('name', '')),
-                'subject': webhook_data.get('subject', 'Contact Form Submission'),
-                'message': webhook_data.get('message', ''),
-                'phone': webhook_data.get('phone', ''),
-                'company': webhook_data.get('company', ''),
-                'service_type': webhook_data.get('service_type', ''),
-                'raw_data': webhook_data,
-                'received_at': timezone.now()
-            }
+            # Handle different data structures
+            if webhook_data.get('form_type') == 'service_inquiry':
+                # Handle service form data structure
+                contact_info = webhook_data.get('contact_info', {})
+                form_data = webhook_data.get('form_data', {})
+                
+                email_data = {
+                    'email_id': f"service_form_{int(datetime.now().timestamp())}",
+                    'sender_email': contact_info.get('email', form_data.get('email', '')),
+                    'sender_name': contact_info.get('name', form_data.get('name', '')),
+                    'subject': f"Service Inquiry - {webhook_data.get('service_type', 'General')}",
+                    'message': f"Service inquiry for: {webhook_data.get('service_type', 'General service')}",
+                    'phone': contact_info.get('phone', form_data.get('phone', '')),
+                    'company': '',
+                    'service_type': webhook_data.get('service_type', ''),
+                    'form_type': 'service_inquiry',
+                    'raw_data': webhook_data,
+                    'received_at': timezone.now()
+                }
+            else:
+                # Handle standard EmailJS webhook structure
+                email_data = {
+                    'email_id': webhook_data.get('email_id', f"emailjs_{int(datetime.now().timestamp())}"),
+                    'sender_email': webhook_data.get('from_email', webhook_data.get('email', '')),
+                    'sender_name': webhook_data.get('from_name', webhook_data.get('name', '')),
+                    'subject': webhook_data.get('subject', 'Contact Form Submission'),
+                    'message': webhook_data.get('message', ''),
+                    'phone': webhook_data.get('phone', ''),
+                    'company': webhook_data.get('company', ''),
+                    'service_type': webhook_data.get('service_type', ''),
+                    'raw_data': webhook_data,
+                    'received_at': timezone.now()
+                }
             
             return email_data
             
@@ -168,15 +188,21 @@ class EmailParser:
                 'extracted_info': {}
             }
             
-            # Determine email type based on keywords
-            if any(keyword in combined_text for keyword in self.service_keywords):
-                parsed_data['email_type'] = 'service_request'
-                parsed_data['extracted_info']['request_type'] = self._extract_service_type(combined_text)
-            elif any(keyword in combined_text for keyword in self.lead_keywords):
-                parsed_data['email_type'] = 'lead_inquiry'
-                parsed_data['extracted_info']['interest_type'] = self._extract_interest_type(combined_text)
+            # Handle service form submissions specially
+            if email_data.get('form_type') == 'service_inquiry':
+                parsed_data['email_type'] = 'lead_inquiry'  # Treat service inquiries as leads
+                parsed_data['extracted_info']['interest_type'] = email_data.get('service_type', 'solar_installation')
+                parsed_data['extracted_info']['source'] = 'website_service_form'
             else:
-                parsed_data['email_type'] = 'general_inquiry'
+                # Determine email type based on keywords for regular emails
+                if any(keyword in combined_text for keyword in self.service_keywords):
+                    parsed_data['email_type'] = 'service_request'
+                    parsed_data['extracted_info']['request_type'] = self._extract_service_type(combined_text)
+                elif any(keyword in combined_text for keyword in self.lead_keywords):
+                    parsed_data['email_type'] = 'lead_inquiry'
+                    parsed_data['extracted_info']['interest_type'] = self._extract_interest_type(combined_text)
+                else:
+                    parsed_data['email_type'] = 'general_inquiry'
             
             # Extract additional information
             parsed_data['extracted_info'].update({
@@ -310,11 +336,19 @@ class EmailParser:
         try:
             from apps.leads.models import Lead, LeadSource
             
-            # Get or create email lead source
-            lead_source, _ = LeadSource.objects.get_or_create(
-                name='Email',
-                defaults={'description': 'Leads from email inquiries'}
-            )
+            # Determine the appropriate lead source
+            if parsed_data.get('extracted_info', {}).get('source') == 'website_service_form':
+                # Get or create website lead source
+                lead_source, _ = LeadSource.objects.get_or_create(
+                    name='Website',
+                    defaults={'description': 'Leads from website contact forms'}
+                )
+            else:
+                # Get or create email lead source
+                lead_source, _ = LeadSource.objects.get_or_create(
+                    name='Email',
+                    defaults={'description': 'Leads from email inquiries'}
+                )
             
             # Prepare lead data
             lead_data = {
@@ -323,10 +357,9 @@ class EmailParser:
                 'last_name': self._extract_last_name(parsed_data.get('sender_name', '')),
                 'email': parsed_data.get('sender_email', ''),
                 'phone': parsed_data.get('phone', ''),
-                'company_name': parsed_data.get('company', ''),
-                'interest_level': 'medium',  # Default for email inquiries
+                'interest_level': 'high' if parsed_data.get('service_type') else 'medium',  # Service inquiries show high interest
                 'property_type': parsed_data.get('extracted_info', {}).get('property_type', 'residential'),
-                'notes': parsed_data.get('message', ''),
+                'notes': f"Service inquiry: {parsed_data.get('service_type', '')}. {parsed_data.get('message', '')}".strip(),
                 'original_data': parsed_data
             }
             
