@@ -1,0 +1,343 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+{% if object %}Edit Lead - {{ object.first_name }} {{ object.last_name }}{% else %}Add New Lead{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-{% if object %}edit{% else %}plus{% endif %}"></i>
+            {% if object %}Edit Lead{% else %}Add New Lead{% endif %}
+        </h1>
+        <p class="subtitle">
+            {% if object %}Update lead information and details{% else %}Create a new lead in the system{% endif %}
+        </p>
+    </div>
+
+    <!-- Form Container -->
+    <div class="form-container">
+        <form method="post" class="needs-validation" novalidate>
+            {% csrf_token %}
+            
+            <!-- Form Sections -->
+            <div class="form-grid">
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-user"></i> Basic Information</h3>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_first_name">
+                                First Name <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-user"></i>
+                                {{ form.first_name }}
+                            </div>
+                            {% if form.first_name.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.first_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_last_name">
+                                Last Name <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-user"></i>
+                                {{ form.last_name }}
+                            </div>
+                            {% if form.last_name.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.last_name.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_email">
+                                Email Address <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-envelope"></i>
+                                {{ form.email }}
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.email.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_phone">
+                                Phone Number <span class="required">*</span>
+                            </label>
+                            <div class="input-with-icon">
+                                <i class="input-icon fas fa-phone"></i>
+                                {{ form.phone }}
+                            </div>
+                            {% if form.phone.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.phone.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lead Classification Section -->
+                <div class="form-section">
+                    <h3><i class="fas fa-tags"></i> Lead Classification</h3>
+                    
+                    <div class="form-grid-2">
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_source">
+                                Lead Source <span class="required">*</span>
+                            </label>
+                            <div class="select-enhanced">
+                                {{ form.source }}
+                            </div>
+                            {% if form.source.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.source.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="form-group-enhanced">
+                            <label class="form-label-enhanced" for="id_status">
+                                Status
+                            </label>
+                            <div class="select-enhanced">
+                                {{ form.status }}
+                            </div>
+                            {% if form.status.errors %}
+                                <div class="form-error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ form.status.errors.0 }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_interest_level">
+                            Interest Level
+                        </label>
+                        <div class="select-enhanced">
+                            {{ form.interest_level }}
+                        </div>
+                        {% if form.interest_level.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.interest_level.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Solar Project Details Section -->
+            <div class="form-section">
+                <h3><i class="fas fa-solar-panel"></i> Solar Project Details</h3>
+                
+                <div class="form-grid-3">
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_property_type">
+                            Property Type
+                        </label>
+                        <div class="select-enhanced">
+                            {{ form.property_type }}
+                        </div>
+                        {% if form.property_type.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.property_type.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_estimated_capacity">
+                            Estimated Capacity (kW)
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="input-icon fas fa-bolt"></i>
+                            {{ form.estimated_capacity }}
+                        </div>
+                        {% if form.estimated_capacity.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.estimated_capacity.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="form-group-enhanced">
+                        <label class="form-label-enhanced" for="id_budget_range">
+                            Budget Range
+                        </label>
+                        <div class="input-with-icon">
+                            <i class="input-icon fas fa-rupee-sign"></i>
+                            {{ form.budget_range }}
+                        </div>
+                        {% if form.budget_range.errors %}
+                            <div class="form-error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                {{ form.budget_range.errors.0 }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{% if object %}{% url 'admin:lead_detail' object.pk %}{% else %}{% url 'admin:leads' %}{% endif %}" 
+                   class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-save"></i> 
+                    {% if object %}Update Lead{% else %}Create Lead{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Form validation
+    const form = document.querySelector('.needs-validation');
+    const inputs = form.querySelectorAll('input, select, textarea');
+    
+    // Add form-control-enhanced class to form fields
+    inputs.forEach(input => {
+        if (!input.classList.contains('form-control-enhanced')) {
+            input.classList.add('form-control-enhanced');
+        }
+        
+        // Real-time validation
+        input.addEventListener('blur', function() {
+            validateField(this);
+        });
+        
+        input.addEventListener('input', function() {
+            if (this.classList.contains('error')) {
+                validateField(this);
+            }
+        });
+    });
+    
+    // Form submission validation
+    form.addEventListener('submit', function(event) {
+        let isValid = true;
+        
+        inputs.forEach(input => {
+            if (!validateField(input)) {
+                isValid = false;
+            }
+        });
+        
+        if (!isValid) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            // Scroll to first error
+            const firstError = form.querySelector('.form-control-enhanced.error');
+            if (firstError) {
+                firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                firstError.focus();
+            }
+        }
+    });
+    
+    function validateField(field) {
+        const isRequired = field.hasAttribute('required') || 
+                          field.closest('.form-group-enhanced').querySelector('.required');
+        
+        // Remove existing validation classes
+        field.classList.remove('error', 'success');
+        
+        // Check if field is empty and required
+        if (isRequired && !field.value.trim()) {
+            field.classList.add('error');
+            return false;
+        }
+        
+        // Email validation
+        if (field.type === 'email' && field.value) {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(field.value)) {
+                field.classList.add('error');
+                return false;
+            }
+        }
+        
+        // Phone validation (basic)
+        if (field.name === 'phone' && field.value) {
+            const phoneRegex = /^[\d\s\-\+\(\)]{10,}$/;
+            if (!phoneRegex.test(field.value)) {
+                field.classList.add('error');
+                return false;
+            }
+        }
+        
+        // If we get here, field is valid
+        if (field.value.trim()) {
+            field.classList.add('success');
+        }
+        
+        return true;
+    }
+    
+    // Auto-format phone number
+    const phoneInput = document.querySelector('input[name="phone"]');
+    if (phoneInput) {
+        phoneInput.addEventListener('input', function() {
+            let value = this.value.replace(/\D/g, '');
+            if (value.length >= 10) {
+                value = value.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+            }
+            this.value = value;
+        });
+    }
+    
+    // Capacity input validation
+    const capacityInput = document.querySelector('input[name="estimated_capacity"]');
+    if (capacityInput) {
+        capacityInput.addEventListener('input', function() {
+            // Only allow numbers and decimal point
+            this.value = this.value.replace(/[^0-9.]/g, '');
+            
+            // Prevent multiple decimal points
+            const parts = this.value.split('.');
+            if (parts.length > 2) {
+                this.value = parts[0] + '.' + parts.slice(1).join('');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

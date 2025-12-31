@@ -375,3 +375,355 @@ class PerformanceIndicator(models.Model):
     
     def __str__(self):
         return f"{self.get_kpi_type_display()} - {self.period_start.date()} ({self.current_value})"
+
+
+class FinancialAnalytics(models.Model):
+    """
+    Financial analytics and reporting data
+    """
+    
+    ANALYTICS_TYPE_CHOICES = [
+        ('cash_flow', 'Cash Flow Analysis'),
+        ('payment_trends', 'Payment Trends'),
+        ('collection_efficiency', 'Collection Efficiency'),
+        ('revenue_forecast', 'Revenue Forecast'),
+        ('outstanding_analysis', 'Outstanding Analysis'),
+        ('payment_method_analysis', 'Payment Method Analysis'),
+    ]
+    
+    analytics_type = models.CharField(
+        max_length=50,
+        choices=ANALYTICS_TYPE_CHOICES,
+        help_text='Type of financial analytics'
+    )
+    period_start = models.DateTimeField(
+        help_text='Start of the analysis period'
+    )
+    period_end = models.DateTimeField(
+        help_text='End of the analysis period'
+    )
+    
+    # Financial metrics
+    total_invoiced = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text='Total amount invoiced'
+    )
+    total_collected = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text='Total amount collected'
+    )
+    total_outstanding = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text='Total outstanding amount'
+    )
+    
+    # Performance metrics
+    collection_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        help_text='Collection rate percentage'
+    )
+    average_payment_time = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Average payment time in days'
+    )
+    
+    # Detailed analytics data
+    analytics_data = models.JSONField(
+        default=dict,
+        help_text='Detailed analytics breakdown and trends'
+    )
+    
+    # Timestamps
+    calculated_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'financial_analytics'
+        verbose_name = 'Financial Analytics'
+        verbose_name_plural = 'Financial Analytics'
+        ordering = ['-period_start', 'analytics_type']
+        indexes = [
+            models.Index(fields=['analytics_type', 'period_start']),
+            models.Index(fields=['period_start', 'period_end']),
+            models.Index(fields=['calculated_at']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['analytics_type', 'period_start', 'period_end'],
+                name='unique_financial_analytics_period'
+            )
+        ]
+    
+    def __str__(self):
+        return f"{self.get_analytics_type_display()} - {self.period_start.date()}"
+    
+    @classmethod
+    def calculate_cash_flow_analysis(cls, start_date, end_date):
+        """Calculate cash flow analysis for the given period."""
+        from apps.services.models import Invoice, Payment
+        
+        # Get invoices and payments in the period
+        invoices = Invoice.objects.filter(
+            invoice_date__range=[start_date, end_date]
+        )
+        payments = Payment.objects.filter(
+            payment_date__range=[start_date, end_date],
+            status='completed'
+        )
+        
+        # Calculate metrics
+        total_invoiced = sum([invoice.total_amount for invoice in invoices])
+        total_collected = sum([payment.amount for payment in payments])
+        
+        # Calculate outstanding (all time, not just period)
+        all_invoices = Invoice.objects.filter(status__in=['sent', 'partial', 'overdue'])
+        total_outstanding = sum([invoice.outstanding_amount for invoice in all_invoices])
+        
+        # Collection rate for the period
+        collection_rate = (total_collected / total_invoiced * 100) if total_invoiced > 0 else 0
+        
+        # Daily breakdown
+        daily_breakdown = {}
+        current_date = start_date
+        while current_date <= end_date:
+            day_invoices = invoices.filter(invoice_date=current_date)
+            day_payments = payments.filter(payment_date=current_date)
+            
+            daily_breakdown[current_date.isoformat()] = {
+                'invoiced': sum([inv.total_amount for inv in day_invoices]),
+                'collected': sum([pay.amount for pay in day_payments]),
+                'net_flow': sum([pay.amount for pay in day_payments]) - sum([inv.total_amount for inv in day_invoices])
+            }
+            current_date += timezone.timedelta(days=1)
+        
+        analytics_data = {
+            'daily_breakdown': daily_breakdown,
+            'invoice_count': invoices.count(),
+            'payment_count': payments.count(),
+            'net_cash_flow': total_collected - total_invoiced,
+            'largest_invoice': max([inv.total_amount for inv in invoices]) if invoices else 0,
+            'largest_payment': max([pay.amount for pay in payments]) if payments else 0,
+        }
+        
+        # Create or update analytics record
+        analytics, created = cls.objects.update_or_create(
+            analytics_type='cash_flow',
+            period_start=timezone.make_aware(timezone.datetime.combine(start_date, timezone.datetime.min.time())),
+            period_end=timezone.make_aware(timezone.datetime.combine(end_date, timezone.datetime.max.time())),
+            defaults={
+                'total_invoiced': total_invoiced,
+                'total_collected': total_collected,
+                'total_outstanding': total_outstanding,
+                'collection_rate': collection_rate,
+                'analytics_data': analytics_data
+            }
+        )
+        
+        return analytics
+    
+    @classmethod
+    def calculate_payment_trends(cls, start_date, end_date):
+        """Calculate payment trends analysis."""
+        from apps.services.models import Payment
+        
+        payments = Payment.objects.filter(
+            payment_date__range=[start_date, end_date],
+            status='completed'
+        )
+        
+        # Payment method breakdown
+        payment_methods = {}
+        for payment in payments:
+            method = payment.payment_method
+            if method not in payment_methods:
+                payment_methods[method] = {'count': 0, 'amount': 0}
+            payment_methods[method]['count'] += 1
+            payment_methods[method]['amount'] += float(payment.amount)
+        
+        # Weekly trends
+        weekly_trends = {}
+        for payment in payments:
+            week_start = payment.payment_date - timezone.timedelta(days=payment.payment_date.weekday())
+            week_key = week_start.isoformat()
+            
+            if week_key not in weekly_trends:
+                weekly_trends[week_key] = {'count': 0, 'amount': 0}
+            weekly_trends[week_key]['count'] += 1
+            weekly_trends[week_key]['amount'] += float(payment.amount)
+        
+        # Average payment size
+        total_amount = sum([payment.amount for payment in payments])
+        avg_payment_size = total_amount / payments.count() if payments.count() > 0 else 0
+        
+        analytics_data = {
+            'payment_methods': payment_methods,
+            'weekly_trends': weekly_trends,
+            'avg_payment_size': float(avg_payment_size),
+            'total_payments': payments.count(),
+            'payment_velocity': payments.count() / ((end_date - start_date).days + 1)  # payments per day
+        }
+        
+        analytics, created = cls.objects.update_or_create(
+            analytics_type='payment_trends',
+            period_start=timezone.make_aware(timezone.datetime.combine(start_date, timezone.datetime.min.time())),
+            period_end=timezone.make_aware(timezone.datetime.combine(end_date, timezone.datetime.max.time())),
+            defaults={
+                'total_collected': total_amount,
+                'analytics_data': analytics_data
+            }
+        )
+        
+        return analytics
+    
+    @classmethod
+    def calculate_collection_efficiency(cls, start_date, end_date):
+        """Calculate collection efficiency metrics."""
+        from apps.services.models import Invoice, Payment
+        
+        # Get invoices created in the period
+        invoices = Invoice.objects.filter(
+            invoice_date__range=[start_date, end_date]
+        )
+        
+        # Calculate payment times
+        payment_times = []
+        for invoice in invoices:
+            if invoice.status == 'paid':
+                # Find the last payment for this invoice
+                last_payment = invoice.payments.filter(status='completed').order_by('-payment_date').first()
+                if last_payment:
+                    payment_time = (last_payment.payment_date - invoice.invoice_date).days
+                    payment_times.append(payment_time)
+        
+        avg_payment_time = sum(payment_times) / len(payment_times) if payment_times else None
+        
+        # Collection rate by age buckets
+        age_buckets = {
+            '0-30': {'count': 0, 'collected': 0, 'total': 0},
+            '31-60': {'count': 0, 'collected': 0, 'total': 0},
+            '61-90': {'count': 0, 'collected': 0, 'total': 0},
+            '90+': {'count': 0, 'collected': 0, 'total': 0}
+        }
+        
+        for invoice in invoices:
+            age = (timezone.now().date() - invoice.invoice_date).days
+            bucket = '0-30' if age <= 30 else '31-60' if age <= 60 else '61-90' if age <= 90 else '90+'
+            
+            age_buckets[bucket]['count'] += 1
+            age_buckets[bucket]['total'] += float(invoice.total_amount)
+            age_buckets[bucket]['collected'] += float(invoice.amount_paid)
+        
+        # Calculate collection rates for each bucket
+        for bucket in age_buckets:
+            if age_buckets[bucket]['total'] > 0:
+                age_buckets[bucket]['collection_rate'] = (age_buckets[bucket]['collected'] / age_buckets[bucket]['total']) * 100
+            else:
+                age_buckets[bucket]['collection_rate'] = 0
+        
+        total_invoiced = sum([invoice.total_amount for invoice in invoices])
+        total_collected = sum([invoice.amount_paid for invoice in invoices])
+        collection_rate = (total_collected / total_invoiced * 100) if total_invoiced > 0 else 0
+        
+        analytics_data = {
+            'age_buckets': age_buckets,
+            'payment_time_distribution': {
+                'min': min(payment_times) if payment_times else 0,
+                'max': max(payment_times) if payment_times else 0,
+                'median': sorted(payment_times)[len(payment_times)//2] if payment_times else 0
+            },
+            'efficiency_score': min(100, max(0, 100 - (avg_payment_time or 30)))  # Efficiency score based on payment time
+        }
+        
+        analytics, created = cls.objects.update_or_create(
+            analytics_type='collection_efficiency',
+            period_start=timezone.make_aware(timezone.datetime.combine(start_date, timezone.datetime.min.time())),
+            period_end=timezone.make_aware(timezone.datetime.combine(end_date, timezone.datetime.max.time())),
+            defaults={
+                'total_invoiced': total_invoiced,
+                'total_collected': total_collected,
+                'collection_rate': collection_rate,
+                'average_payment_time': avg_payment_time,
+                'analytics_data': analytics_data
+            }
+        )
+        
+        return analytics
+
+
+class PaymentTrendAnalysis(models.Model):
+    """
+    Detailed payment trend analysis
+    """
+    
+    TREND_TYPE_CHOICES = [
+        ('daily', 'Daily Trends'),
+        ('weekly', 'Weekly Trends'),
+        ('monthly', 'Monthly Trends'),
+        ('seasonal', 'Seasonal Trends'),
+    ]
+    
+    trend_type = models.CharField(
+        max_length=20,
+        choices=TREND_TYPE_CHOICES,
+        help_text='Type of trend analysis'
+    )
+    period_start = models.DateTimeField(
+        help_text='Start of the analysis period'
+    )
+    period_end = models.DateTimeField(
+        help_text='End of the analysis period'
+    )
+    
+    # Trend data
+    trend_data = models.JSONField(
+        default=dict,
+        help_text='Detailed trend analysis data'
+    )
+    
+    # Summary metrics
+    total_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text='Total amount in the trend period'
+    )
+    average_amount = models.DecimalField(
+        max_digits=15,
+        decimal_places=2,
+        default=0,
+        help_text='Average amount per period unit'
+    )
+    growth_rate = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text='Growth rate compared to previous period'
+    )
+    
+    # Timestamps
+    calculated_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'payment_trend_analysis'
+        verbose_name = 'Payment Trend Analysis'
+        verbose_name_plural = 'Payment Trend Analysis'
+        ordering = ['-period_start', 'trend_type']
+        indexes = [
+            models.Index(fields=['trend_type', 'period_start']),
+            models.Index(fields=['calculated_at']),
+        ]
+    
+    def __str__(self):
+        return f"{self.get_trend_type_display()} - {self.period_start.date()}"

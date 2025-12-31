@@ -376,8 +376,12 @@
 
 <script>
 // Sticky Navbar
-const navbar = document.getElementById('navbar');
-window.addEventListener('scroll',()=>{navbar.classList.toggle('scrolled', window.scrollY>50);});
+const navbar = document.querySelector('.navbar');
+if (navbar) {
+    window.addEventListener('scroll', () => {
+        navbar.classList.toggle('scrolled', window.scrollY > 50);
+    });
+}
 
 // Service Modal
 function openModal(service){
@@ -404,29 +408,40 @@ document.getElementById('service-form').addEventListener('submit', function(even
 // Chatbot Logic
 const chatModal = document.getElementById("chatModal");
 const openBtn = document.getElementById("openModal");
-const closeBtn = chatModal.querySelector(".close");
+const closeBtn = chatModal ? chatModal.querySelector(".close") : null;
 const chatBody = document.getElementById("chatBody");
 const chatInput = document.getElementById("chatInput");
 const sendBtn = document.getElementById("sendBtn");
 
-openBtn.onclick = () => { chatModal.style.display = "flex"; }
-closeBtn.onclick = () => { chatModal.style.display = "none"; }
-window.onclick = (e) => { if (e.target == chatModal) chatModal.style.display = "none"; }
+// Only add event listeners if elements exist
+if (openBtn) {
+    openBtn.onclick = () => { chatModal.style.display = "flex"; }
+}
 
-sendBtn.onclick = () => {
-    let msg = chatInput.value.trim();
-    if(msg){
-        let newMsg = document.createElement("div");
-        newMsg.textContent = msg;
-        newMsg.style.margin = "10px 0";
-        newMsg.style.padding = "8px 12px";
-        newMsg.style.background = "#eee";
-        newMsg.style.borderRadius = "10px";
-        chatBody.appendChild(newMsg);
-        chatInput.value = "";
-        chatBody.scrollTop = chatBody.scrollHeight;
-    }
-};
+if (closeBtn) {
+    closeBtn.onclick = () => { chatModal.style.display = "none"; }
+}
+
+if (chatModal) {
+    window.onclick = (e) => { if (e.target == chatModal) chatModal.style.display = "none"; }
+}
+
+if (sendBtn && chatInput && chatBody) {
+    sendBtn.onclick = () => {
+        let msg = chatInput.value.trim();
+        if(msg){
+            let newMsg = document.createElement("div");
+            newMsg.textContent = msg;
+            newMsg.style.margin = "10px 0";
+            newMsg.style.padding = "8px 12px";
+            newMsg.style.background = "#eee";
+            newMsg.style.borderRadius = "10px";
+            chatBody.appendChild(newMsg);
+            chatInput.value = "";
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+    };
+}
 </script>
 </body>
 </html>

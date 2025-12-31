@@ -1,0 +1,307 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - Solar CRM Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+        <p class="subtitle">Welcome to your Solar CRM control center</p>
+    </div>
+
+    <!-- Metrics Grid -->
+    <div class="metrics-grid">
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>{{ total_leads }}</h3>
+                    <p>Total Leads</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>+{{ leads_this_month }} this month</span>
+                    </div>
+                </div>
+                <div class="metric-icon leads">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>{{ total_customers }}</h3>
+                    <p>Active Customers</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>{{ conversion_rate }}% conversion rate</span>
+                    </div>
+                </div>
+                <div class="metric-icon customers">
+                    <i class="fas fa-users"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>₹{{ monthly_revenue|floatformat:0 }}</h3>
+                    <p>Monthly Revenue</p>
+                    <div class="metric-trend trend-up">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>This month</span>
+                    </div>
+                </div>
+                <div class="metric-icon revenue">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>{{ active_services }}</h3>
+                    <p>Active Services</p>
+                    <div class="metric-trend trend-neutral">
+                        <i class="fas fa-minus"></i>
+                        <span>{{ services_this_month }} this month</span>
+                    </div>
+                </div>
+                <div class="metric-icon services">
+                    <i class="fas fa-tools"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Grid -->
+    <div class="dashboard-grid">
+        <!-- Charts Row -->
+        <div class="dashboard-row">
+            <!-- Leads Chart -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Lead Generation Trend</h3>
+                    <div class="chart-filters">
+                        <button class="chart-filter-btn active" data-period="7d">7 Days</button>
+                        <button class="chart-filter-btn" data-period="30d">30 Days</button>
+                        <button class="chart-filter-btn" data-period="90d">90 Days</button>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="leadsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Conversion Funnel -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-filter"></i> Conversion Funnel</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="conversionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity and Actions Row -->
+        <div class="dashboard-row">
+            <!-- Recent Activity -->
+            <div class="activity-feed">
+                <div class="card-header">
+                    <h3><i class="fas fa-clock"></i> Recent Activity</h3>
+                </div>
+                
+                {% for lead in recent_leads %}
+                <div class="activity-item">
+                    <div class="activity-icon new-lead">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>New Lead: {{ lead.first_name }} {{ lead.last_name }}</h4>
+                        <p>{{ lead.email }} - {{ lead.source.name }}</p>
+                        <div class="activity-time">{{ lead.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <p>No recent activity</p>
+                    </div>
+                </div>
+                {% endfor %}
+
+                {% for service in recent_services %}
+                <div class="activity-item">
+                    <div class="activity-icon service">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <div class="activity-content">
+                        <h4>Service Request: {{ service.ticket_number }}</h4>
+                        <p>{{ service.subject }} - {{ service.customer.lead.first_name }} {{ service.customer.lead.last_name }}</p>
+                        <div class="activity-time">{{ service.created_at|timesince }} ago</div>
+                    </div>
+                </div>
+                {% empty %}
+                {% if not recent_leads %}
+                <div class="activity-item">
+                    <div class="activity-content">
+                        <p>No recent service requests</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <div class="card-header">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                </div>
+                
+                <div class="quick-actions-grid">
+                    <a href="{% url 'admin:lead_create' %}" class="quick-action-btn">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Lead</span>
+                    </a>
+                    
+                    <a href="{% url 'admin:customer_create' %}" class="quick-action-btn">
+                        <i class="fas fa-users"></i>
+                        <span>Add Customer</span>
+                    </a>
+                    
+                    <a href="{% url 'admin:service_create' %}" class="quick-action-btn">
+                        <i class="fas fa-tools"></i>
+                        <span>New Service</span>
+                    </a>
+                    
+                    <a href="{% url 'admin:analytics' %}" class="quick-action-btn">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>View Reports</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    initializeLeadsChart();
+    initializeConversionChart();
+    
+    // Chart filter buttons
+    document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from siblings
+            this.parentNode.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update chart data based on period
+            const period = this.dataset.period;
+            updateLeadsChart(period);
+        });
+    });
+});
+
+function initializeLeadsChart() {
+    const ctx = document.getElementById('leadsChart').getContext('2d');
+    window.leadsChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+            datasets: [{
+                label: 'New Leads',
+                data: [12, 19, 8, 15, 22, 18, 25],
+                borderColor: '#fdd835',
+                backgroundColor: 'rgba(253, 216, 53, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeConversionChart() {
+    const ctx = document.getElementById('conversionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Converted', 'In Progress', 'New'],
+            datasets: [{
+                data: [{{ conversion_rate }}, 25, 75],
+                backgroundColor: [
+                    '#4CAF50',
+                    '#fdd835',
+                    '#e1e5e9'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateLeadsChart(period) {
+    // Fetch new data based on period
+    fetch(`{% url 'admin:chart_data_api' 'leads_by_month' %}?period=${period}`)
+        .then(response => response.json())
+        .then(data => {
+            if (window.leadsChart && data.labels && data.data) {
+                window.leadsChart.data.labels = data.labels;
+                window.leadsChart.data.datasets[0].data = data.data;
+                window.leadsChart.update();
+            }
+        })
+        .catch(error => console.error('Error updating chart:', error));
+}
+</script>
+{% endblock %}

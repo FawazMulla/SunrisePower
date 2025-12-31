@@ -227,7 +227,7 @@ class Lead(models.Model):
         ]
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(score__gte=0) & models.Q(score__lte=100),
+                check=models.Q(score__gte=0) & models.Q(score__lte=100),
                 name='valid_lead_score'
             ),
         ]

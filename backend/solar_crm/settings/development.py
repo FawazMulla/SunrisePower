@@ -8,19 +8,19 @@ from .base import *
 DEBUG = True
 
 # Development-specific apps
-INSTALLED_APPS += [
-    'debug_toolbar',
-]
+# INSTALLED_APPS += [
+#     'debug_toolbar',
+# ]
 
-MIDDLEWARE += [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
-]
+# MIDDLEWARE += [
+#     'debug_toolbar.middleware.DebugToolbarMiddleware',
+# ]
 
 # Debug toolbar configuration
-INTERNAL_IPS = [
-    '127.0.0.1',
-    'localhost',
-]
+# INTERNAL_IPS = [
+#     '127.0.0.1',
+#     'localhost',
+# ]
 
 # Database for development (SQLite)
 DATABASES = {
@@ -46,5 +46,5 @@ SECURE_HSTS_PRELOAD = False
 STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # Logging for development
-LOGGING['handlers']['console']['level'] = 'DEBUG'
-LOGGING['loggers']['django']['level'] = 'DEBUG'
+LOGGING['handlers']['console']['level'] = 'INFO'
+LOGGING['loggers']['django']['level'] = 'INFO'

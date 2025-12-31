@@ -1,0 +1,542 @@
+{% extends "base/admin_base.html" %}
+{% load static %}
+
+{% block title %}Invoices - Sunrise Power CRM{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+<style>
+.invoice-filters {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.filter-group label {
+    font-weight: bold;
+    color: #3D2B1F;
+    margin-bottom: 5px;
+}
+
+.filter-group select,
+.filter-group input {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.invoice-table-container {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow-x: auto;
+}
+
+.invoice-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.invoice-table th,
+.invoice-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.invoice-table th {
+    background: #fcf8f0;
+    font-weight: bold;
+    color: #3D2B1F;
+    position: sticky;
+    top: 0;
+}
+
+.invoice-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.amount {
+    font-weight: bold;
+    color: #2e7d32;
+}
+
+.overdue-amount {
+    font-weight: bold;
+    color: #c62828;
+}
+
+.status-badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.status-draft {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.status-sent {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.status-paid {
+    background: #e8f5e8;
+    color: #2e7d32;
+}
+
+.status-partial {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.status-overdue {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-action {
+    padding: 4px 8px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    text-decoration: none;
+    color: white;
+}
+
+.btn-view {
+    background: #1976d2;
+}
+
+.btn-edit {
+    background: #f57c00;
+}
+
+.btn-send {
+    background: #2e7d32;
+}
+
+.btn-action:hover {
+    opacity: 0.8;
+    color: white;
+    text-decoration: none;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.pagination button,
+.pagination a {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    background: white;
+    color: #3D2B1F;
+    text-decoration: none;
+    border-radius: 4px;
+}
+
+.pagination button:hover,
+.pagination a:hover {
+    background: #fdd835;
+    text-decoration: none;
+}
+
+.pagination .current {
+    background: #fdd835;
+    font-weight: bold;
+}
+
+.summary-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.summary-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    text-align: center;
+}
+
+.summary-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #3D2B1F;
+}
+
+.summary-label {
+    color: #666;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1>Invoice Management</h1>
+    <div class="header-actions">
+        <a href="{% url 'services:invoice-list-create' %}" class="btn-primary">Create New Invoice</a>
+    </div>
+</div>
+
+<div class="summary-cards">
+    <div class="summary-card">
+        <div class="summary-value" id="total-invoices">0</div>
+        <div class="summary-label">Total Invoices</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="total-amount">₹0</div>
+        <div class="summary-label">Total Amount</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="paid-amount">₹0</div>
+        <div class="summary-label">Paid Amount</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="outstanding-amount">₹0</div>
+        <div class="summary-label">Outstanding</div>
+    </div>
+    <div class="summary-card">
+        <div class="summary-value" id="overdue-count">0</div>
+        <div class="summary-label">Overdue Invoices</div>
+    </div>
+</div>
+
+<div class="invoice-filters">
+    <div class="filter-row">
+        <div class="filter-group">
+            <label for="status-filter">Status</label>
+            <select id="status-filter">
+                <option value="">All Statuses</option>
+                <option value="draft">Draft</option>
+                <option value="sent">Sent</option>
+                <option value="paid">Paid</option>
+                <option value="partial">Partially Paid</option>
+                <option value="overdue">Overdue</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="type-filter">Type</label>
+            <select id="type-filter">
+                <option value="">All Types</option>
+                <option value="project">Project Invoice</option>
+                <option value="amc">AMC Invoice</option>
+                <option value="service">Service Invoice</option>
+            </select>
+        </div>
+        
+        <div class="filter-group">
+            <label for="customer-filter">Customer</label>
+            <input type="text" id="customer-filter" placeholder="Search customer...">
+        </div>
+        
+        <div class="filter-group">
+            <label for="date-from">From Date</label>
+            <input type="date" id="date-from">
+        </div>
+        
+        <div class="filter-group">
+            <label for="date-to">To Date</label>
+            <input type="date" id="date-to">
+        </div>
+        
+        <div class="filter-group">
+            <button onclick="applyFilters()" class="btn-primary">Apply Filters</button>
+            <button onclick="clearFilters()" class="btn-secondary">Clear</button>
+        </div>
+    </div>
+</div>
+
+<div class="invoice-table-container">
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Invoice #</th>
+                <th>Customer</th>
+                <th>Type</th>
+                <th>Amount</th>
+                <th>Paid</th>
+                <th>Outstanding</th>
+                <th>Invoice Date</th>
+                <th>Due Date</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody id="invoice-table-body">
+            <tr>
+                <td colspan="10" style="text-align: center; padding: 40px;">
+                    Loading invoices...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="pagination" id="pagination">
+    <!-- Pagination will be populated by JavaScript -->
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentPage = 1;
+let currentFilters = {};
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadInvoices();
+    loadSummary();
+    
+    // Set up filter event listeners
+    document.getElementById('status-filter').addEventListener('change', applyFilters);
+    document.getElementById('type-filter').addEventListener('change', applyFilters);
+    document.getElementById('customer-filter').addEventListener('input', debounce(applyFilters, 500));
+    document.getElementById('date-from').addEventListener('change', applyFilters);
+    document.getElementById('date-to').addEventListener('change', applyFilters);
+});
+
+function loadInvoices(page = 1) {
+    currentPage = page;
+    
+    // Build query parameters
+    const params = new URLSearchParams({
+        page: page,
+        ...currentFilters
+    });
+    
+    fetch(`/api/services/invoices/?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            displayInvoices(data.results);
+            updatePagination(data);
+        })
+        .catch(error => {
+            console.error('Error loading invoices:', error);
+            document.getElementById('invoice-table-body').innerHTML = 
+                '<tr><td colspan="10" style="text-align: center; color: red;">Error loading invoices</td></tr>';
+        });
+}
+
+function loadSummary() {
+    fetch('/api/services/invoices/')
+        .then(response => response.json())
+        .then(data => {
+            // Calculate summary from all invoices
+            let totalAmount = 0;
+            let paidAmount = 0;
+            let outstandingAmount = 0;
+            let overdueCount = 0;
+            
+            data.results.forEach(invoice => {
+                totalAmount += parseFloat(invoice.total_amount);
+                paidAmount += parseFloat(invoice.amount_paid);
+                outstandingAmount += parseFloat(invoice.outstanding_amount);
+                if (invoice.is_overdue) overdueCount++;
+            });
+            
+            document.getElementById('total-invoices').textContent = data.count || data.results.length;
+            document.getElementById('total-amount').textContent = formatCurrency(totalAmount);
+            document.getElementById('paid-amount').textContent = formatCurrency(paidAmount);
+            document.getElementById('outstanding-amount').textContent = formatCurrency(outstandingAmount);
+            document.getElementById('overdue-count').textContent = overdueCount;
+        })
+        .catch(error => {
+            console.error('Error loading summary:', error);
+        });
+}
+
+function displayInvoices(invoices) {
+    const tbody = document.getElementById('invoice-table-body');
+    
+    if (invoices.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align: center;">No invoices found</td></tr>';
+        return;
+    }
+    
+    tbody.innerHTML = invoices.map(invoice => `
+        <tr>
+            <td><strong>${invoice.invoice_number}</strong></td>
+            <td>${invoice.customer_name}</td>
+            <td>${invoice.invoice_type_display}</td>
+            <td class="amount">${formatCurrency(invoice.total_amount)}</td>
+            <td class="amount">${formatCurrency(invoice.amount_paid)}</td>
+            <td class="${invoice.outstanding_amount > 0 ? 'overdue-amount' : 'amount'}">
+                ${formatCurrency(invoice.outstanding_amount)}
+            </td>
+            <td>${formatDate(invoice.invoice_date)}</td>
+            <td class="${invoice.is_overdue ? 'overdue-amount' : ''}">
+                ${formatDate(invoice.due_date)}
+                ${invoice.is_overdue ? `<br><small>(${invoice.days_overdue} days overdue)</small>` : ''}
+            </td>
+            <td>
+                <span class="status-badge status-${invoice.status}">${invoice.status_display}</span>
+            </td>
+            <td>
+                <div class="action-buttons">
+                    <a href="/admin/services/invoices/${invoice.id}/" class="btn-action btn-view">View</a>
+                    ${invoice.status === 'draft' ? 
+                        `<button onclick="sendInvoice(${invoice.id})" class="btn-action btn-send">Send</button>` : 
+                        ''
+                    }
+                </div>
+            </td>
+        </tr>
+    `).join('');
+}
+
+function updatePagination(data) {
+    const pagination = document.getElementById('pagination');
+    
+    if (!data.count || data.count <= 20) {
+        pagination.innerHTML = '';
+        return;
+    }
+    
+    const totalPages = Math.ceil(data.count / 20);
+    let paginationHTML = '';
+    
+    // Previous button
+    if (data.previous) {
+        paginationHTML += `<button onclick="loadInvoices(${currentPage - 1})">Previous</button>`;
+    }
+    
+    // Page numbers
+    for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+        paginationHTML += `<button onclick="loadInvoices(${i})" class="${i === currentPage ? 'current' : ''}">${i}</button>`;
+    }
+    
+    // Next button
+    if (data.next) {
+        paginationHTML += `<button onclick="loadInvoices(${currentPage + 1})">Next</button>`;
+    }
+    
+    pagination.innerHTML = paginationHTML;
+}
+
+function applyFilters() {
+    currentFilters = {
+        status: document.getElementById('status-filter').value,
+        invoice_type: document.getElementById('type-filter').value,
+        customer__name__icontains: document.getElementById('customer-filter').value,
+        invoice_date__gte: document.getElementById('date-from').value,
+        invoice_date__lte: document.getElementById('date-to').value
+    };
+    
+    // Remove empty filters
+    Object.keys(currentFilters).forEach(key => {
+        if (!currentFilters[key]) {
+            delete currentFilters[key];
+        }
+    });
+    
+    loadInvoices(1);
+}
+
+function clearFilters() {
+    document.getElementById('status-filter').value = '';
+    document.getElementById('type-filter').value = '';
+    document.getElementById('customer-filter').value = '';
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+    
+    currentFilters = {};
+    loadInvoices(1);
+}
+
+function sendInvoice(invoiceId) {
+    if (confirm('Are you sure you want to send this invoice?')) {
+        fetch(`/api/services/invoices/${invoiceId}/send/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                alert(data.message);
+                loadInvoices(currentPage);
+            } else {
+                alert('Error sending invoice: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error sending invoice:', error);
+            alert('Error sending invoice');
+        });
+    }
+}
+
+function formatCurrency(amount) {
+    return '₹' + new Intl.NumberFormat('en-IN').format(amount);
+}
+
+function formatDate(dateString) {
+    return new Date(dateString).toLocaleDateString('en-IN');
+}
+
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

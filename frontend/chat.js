@@ -1,7 +1,7 @@
 class ChatBot {
     constructor() {
         this.config = {
-            apiKey: "", // 🔴 REPLACE
+            apiKey: "", // Will be loaded from backend
             apiUrl: "https://api.cohere.ai/v2/chat",
             model: "command-a-03-2025",
 
@@ -42,9 +42,15 @@ When a user asks about solar panels for a city (e.g., Mumbai), respond in the st
         this.isOpen = false;
         this.isProcessing = false;
         this.conversationHistory = [];
+        
+        // CRM integration properties
+        this.sessionId = this.generateSessionId();
+        this.userInfo = {};
+        this.conversationContext = {};
 
         this.initElements();
         this.initEvents();
+        this.loadApiKey();
         this.initWelcome();
     }
 
@@ -83,6 +89,28 @@ When a user asks about solar panels for a city (e.g., Mumbai), respond in the st
         }
     }
 
+    async loadApiKey() {
+        try {
+            const response = await fetch('/api/integrations/config/cohere-key/');
+            
+            if (response.ok) {
+                const data = await response.json();
+                this.config.apiKey = data.api_key;
+            } else {
+                console.warn('Could not load Cohere API key from backend:', response.status, response.statusText);
+                // Try to get error details
+                try {
+                    const errorData = await response.json();
+                    console.warn('Error details:', errorData);
+                } catch (e) {
+                    console.warn('Could not parse error response');
+                }
+            }
+        } catch (error) {
+            console.warn('Error loading Cohere API key:', error);
+        }
+    }
+
     /* ---------------- CHAT FLOW ---------------- */
 
     toggleChat() {
@@ -97,16 +125,33 @@ When a user asks about solar panels for a city (e.g., Mumbai), respond in the st
     closeChat() {
         this.isOpen = false;
         this.chatModal.style.display = "none";
+        
+        // Send conversation data to CRM when chat is closed (if there was meaningful interaction)
+        this.sendConversationToCRM();
     }
 
     async sendMessage() {
         const message = this.messageInput.value.trim();
         if (!message || this.isProcessing) return;
 
+        // Ensure API key is loaded before sending message
+        if (!this.config.apiKey) {
+            await this.loadApiKey();
+        }
+
+        // Check if we still don't have an API key
+        if (!this.config.apiKey) {
+            this.addMessage("⚠️ Chatbot service is temporarily unavailable. Please try again later.", "bot");
+            return;
+        }
+
         this.addMessage(message, "user");
         this.messageInput.value = "";
         this.setProcessing(true);
         this.showTyping(true);
+
+        // Extract user information from message
+        this.extractUserInfo(message);
 
         try {
             const reply = await this.callCohere(message);
@@ -179,6 +224,108 @@ When a user asks about solar panels for a city (e.g., Mumbai), respond in the st
         }
 
         return botText;
+    }
+
+    /* ---------------- CRM INTEGRATION ---------------- */
+
+    generateSessionId() {
+        return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    extractUserInfo(message) {
+        // Extract email addresses
+        const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
+        const emails = message.match(emailRegex);
+        if (emails && emails.length > 0) {
+            this.userInfo.email = emails[0];
+        }
+
+        // Extract phone numbers (Indian format)
+        const phoneRegex = /(?:\+91|91)?[-.\s]?[6-9]\d{9}/g;
+        const phones = message.match(phoneRegex);
+        if (phones && phones.length > 0) {
+            this.userInfo.phone = phones[0].replace(/[-.\s]/g, '');
+        }
+
+        // Extract names (simple heuristic)
+        const namePatterns = [
+            /my name is ([a-zA-Z\s]+)/i,
+            /i am ([a-zA-Z\s]+)/i,
+            /this is ([a-zA-Z\s]+)/i
+        ];
+        
+        for (const pattern of namePatterns) {
+            const match = message.match(pattern);
+            if (match && match[1]) {
+                const fullName = match[1].trim();
+                const nameParts = fullName.split(' ');
+                this.userInfo.first_name = nameParts[0];
+                if (nameParts.length > 1) {
+                    this.userInfo.last_name = nameParts.slice(1).join(' ');
+                }
+                break;
+            }
+        }
+    }
+
+    async sendConversationToCRM() {
+        // Only send if there was meaningful conversation (more than just welcome message)
+        if (this.conversationHistory.length < 2) {
+            return;
+        }
+
+        try {
+            const conversationData = {
+                session_id: this.sessionId,
+                user_messages: this.conversationHistory
+                    .filter(msg => msg.role === 'user')
+                    .map(msg => msg.text),
+                bot_responses: this.conversationHistory
+                    .filter(msg => msg.role === 'assistant')
+                    .map(msg => msg.text),
+                user_info: this.userInfo,
+                conversation_context: {
+                    total_messages: this.conversationHistory.length,
+                    session_duration: Date.now() - parseInt(this.sessionId.split('_')[1]),
+                    timestamp: new Date().toISOString()
+                }
+            };
+
+            // Send to CRM API (invisible to user)
+            const response = await fetch('/api/integrations/webhooks/chatbot/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken()
+                },
+                body: JSON.stringify(conversationData)
+            });
+
+            if (response.ok) {
+                console.log('Conversation data sent to CRM successfully');
+            } else {
+                console.warn('Failed to send conversation data to CRM:', response.status);
+            }
+        } catch (error) {
+            // Silently handle errors - don't disrupt user experience
+            console.warn('Error sending conversation data to CRM:', error);
+        }
+    }
+
+    getCSRFToken() {
+        // Get CSRF token from cookie or meta tag
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        
+        if (cookieValue) {
+            return cookieValue;
+        }
+
+        // Fallback: get from meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        return metaTag ? metaTag.getAttribute('content') : '';
     }
 
     /* ---------------- UI HELPERS ---------------- */

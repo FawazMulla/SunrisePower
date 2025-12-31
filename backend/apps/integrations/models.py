@@ -389,5 +389,141 @@ class CalculatorData(models.Model):
         return f"Calculator - {self.user_email or 'Anonymous'} ({self.calculation_date.date()})"
 
 
+class ErrorLog(models.Model):
+    """
+    Log all system errors for monitoring and analysis
+    """
+    
+    SEVERITY_CHOICES = [
+        ('low', 'Low'),
+        ('medium', 'Medium'),
+        ('high', 'High'),
+        ('critical', 'Critical'),
+    ]
+    
+    CATEGORY_CHOICES = [
+        ('email_processing', 'Email Processing'),
+        ('api_integration', 'API Integration'),
+        ('database', 'Database'),
+        ('external_service', 'External Service'),
+        ('validation', 'Validation'),
+        ('authentication', 'Authentication'),
+        ('permission', 'Permission'),
+        ('system', 'System'),
+    ]
+    
+    # Error identification
+    error_id = models.CharField(
+        max_length=100,
+        unique=True,
+        help_text='Unique error identifier'
+    )
+    category = models.CharField(
+        max_length=50,
+        choices=CATEGORY_CHOICES,
+        help_text='Error category'
+    )
+    severity = models.CharField(
+        max_length=20,
+        choices=SEVERITY_CHOICES,
+        help_text='Error severity level'
+    )
+    
+    # Error details
+    error_type = models.CharField(
+        max_length=200,
+        help_text='Type of error (exception class name)'
+    )
+    error_message = models.TextField(
+        help_text='Error message'
+    )
+    traceback = models.TextField(
+        help_text='Full error traceback'
+    )
+    
+    # Context information
+    context = models.JSONField(
+        default=dict,
+        help_text='Additional context information'
+    )
+    user_id = models.IntegerField(
+        null=True,
+        blank=True,
+        help_text='ID of user associated with error'
+    )
+    request_data = models.JSONField(
+        default=dict,
+        help_text='Request data that caused the error'
+    )
+    
+    # Recovery information
+    recovery_attempted = models.BooleanField(
+        default=False,
+        help_text='Whether recovery was attempted'
+    )
+    recovery_successful = models.BooleanField(
+        default=False,
+        help_text='Whether recovery was successful'
+    )
+    recovery_notes = models.TextField(
+        blank=True,
+        help_text='Notes about recovery attempt'
+    )
+    
+    # Resolution tracking
+    resolved = models.BooleanField(
+        default=False,
+        help_text='Whether error has been resolved'
+    )
+    resolved_by = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='resolved_errors',
+        help_text='User who resolved the error'
+    )
+    resolved_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text='When error was resolved'
+    )
+    resolution_notes = models.TextField(
+        blank=True,
+        help_text='Notes about error resolution'
+    )
+    
+    # Timestamps
+    timestamp = models.DateTimeField(
+        help_text='When error occurred'
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'error_logs'
+        verbose_name = 'Error Log'
+        verbose_name_plural = 'Error Logs'
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['error_id']),
+            models.Index(fields=['category']),
+            models.Index(fields=['severity']),
+            models.Index(fields=['timestamp']),
+            models.Index(fields=['resolved']),
+        ]
+    
+    def __str__(self):
+        return f"[{self.severity.upper()}] {self.error_type}: {self.error_message[:50]}..."
+    
+    def mark_as_resolved(self, user, notes=""):
+        """Mark error as resolved."""
+        self.resolved = True
+        self.resolved_by = user
+        self.resolved_at = timezone.now()
+        self.resolution_notes = notes
+        self.save(update_fields=['resolved', 'resolved_by', 'resolved_at', 'resolution_notes', 'updated_at'])
+
+
 # Import the BackgroundTask model from tasks.py
 from .tasks import BackgroundTask

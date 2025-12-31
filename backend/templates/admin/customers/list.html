@@ -1,0 +1,229 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}Customers Management - Solar CRM Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-users"></i> Customers Management</h1>
+        <p class="subtitle">Manage your converted customers and their projects</p>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <form method="get" class="search-form">
+            <div class="search-row">
+                <div class="search-field">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search by name, email, or company..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                
+                <div class="search-field">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option>
+                        <option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                    </select>
+                </div>
+                
+                <div class="search-field">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'admin:customers' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="text-muted">{{ paginator.count }} customer{{ paginator.count|pluralize }} found</span>
+        </div>
+        <div>
+            <a href="{% url 'admin:customer_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add New Customer
+            </a>
+        </div>
+    </div>
+
+    <!-- Customers Table -->
+    <div class="data-table-container">
+        <div class="data-table-header">
+            <h3><i class="fas fa-list"></i> Customers List</h3>
+            <div class="table-actions">
+                <button class="btn btn-sm btn-secondary" onclick="exportCustomers()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+        
+        {% if customers %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Customer</th>
+                    <th>Contact</th>
+                    <th>Location</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Total Value</th>
+                    <th>Outstanding</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in customers %}
+                <tr>
+                    <td>
+                        <div>
+                            <strong>
+                                {% if customer.lead %}
+                                {{ customer.lead.first_name }} {{ customer.lead.last_name }}
+                                {% else %}
+                                Customer #{{ customer.id }}
+                                {% endif %}
+                            </strong>
+                            {% if customer.company_name %}
+                            <br><small class="text-muted">{{ customer.company_name }}</small>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        {% if customer.lead %}
+                        <div>{{ customer.lead.email }}</div>
+                        <div><small class="text-muted">{{ customer.lead.phone }}</small></div>
+                        {% else %}
+                        <small class="text-muted">No contact info</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.city %}
+                        <div>{{ customer.city }}</div>
+                        {% if customer.state %}
+                        <small class="text-muted">{{ customer.state }}</small>
+                        {% endif %}
+                        {% else %}
+                        <small class="text-muted">Not specified</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.customer_type == 'residential' %}
+                        <span class="badge badge-info">Residential</span>
+                        {% elif customer.customer_type == 'commercial' %}
+                        <span class="badge badge-warning">Commercial</span>
+                        {% elif customer.customer_type == 'industrial' %}
+                        <span class="badge badge-success">Industrial</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ customer.customer_type|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if customer.status == 'active' %}
+                        <span class="badge badge-success">Active</span>
+                        {% elif customer.status == 'inactive' %}
+                        <span class="badge badge-secondary">Inactive</span>
+                        {% elif customer.status == 'pending' %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% else %}
+                        <span class="badge badge-info">{{ customer.status|title }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <strong class="text-success">₹{{ customer.total_value|floatformat:0 }}</strong>
+                    </td>
+                    <td>
+                        {% if customer.outstanding_amount > 0 %}
+                        <strong class="text-warning">₹{{ customer.outstanding_amount|floatformat:0 }}</strong>
+                        {% else %}
+                        <span class="text-muted">₹0</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ customer.created_at|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ customer.created_at|timesince }} ago</small>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'admin:customer_detail' customer.pk %}" class="btn btn-sm btn-secondary" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'admin:customer_edit' customer.pk %}" class="btn btn-sm btn-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'admin:customer_delete' customer.pk %}" class="btn btn-sm btn-danger" 
+                               title="Delete" data-confirm-delete>
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center" style="padding: 60px 20px;">
+            <i class="fas fa-users" style="font-size: 3rem; color: #ddd; margin-bottom: 20px;"></i>
+            <h3>No customers found</h3>
+            <p class="text-muted">No customers match your current filters.</p>
+            <a href="{% url 'admin:customer_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Add Your First Customer
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+        {% endif %}
+        
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportCustomers() {
+    // Placeholder for export functionality
+    alert('Export functionality will be implemented in a future update.');
+}
+
+// Auto-submit form on filter change
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.querySelector('select[name="status"]');
+    
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+});
+</script>
+{% endblock %}

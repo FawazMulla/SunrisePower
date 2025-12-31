@@ -1,0 +1,598 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}Analytics Dashboard - Solar CRM Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-chart-bar"></i> Analytics Dashboard</h1>
+        <p class="subtitle">Comprehensive business intelligence and performance metrics</p>
+    </div>
+
+    <!-- Performance Indicators -->
+    <div class="performance-grid">
+        <div class="performance-card">
+            <div class="performance-value good">{{ lead_conversion_rate }}%</div>
+            <div class="performance-label">Lead Conversion Rate</div>
+            <div class="performance-change trend-up">
+                <i class="fas fa-arrow-up"></i> +2.3% from last month
+            </div>
+        </div>
+
+        <div class="performance-card">
+            <div class="performance-value good">{{ average_response_time }}</div>
+            <div class="performance-label">Avg Response Time</div>
+            <div class="performance-change trend-up">
+                <i class="fas fa-arrow-down"></i> -15min from last month
+            </div>
+        </div>
+
+        <div class="performance-card">
+            <div class="performance-value good">{{ customer_satisfaction }}</div>
+            <div class="performance-label">Customer Satisfaction</div>
+            <div class="performance-change trend-up">
+                <i class="fas fa-arrow-up"></i> +0.2 from last month
+            </div>
+        </div>
+
+        <div class="performance-card">
+            <div class="performance-value good">{{ revenue_growth }}</div>
+            <div class="performance-label">Revenue Growth</div>
+            <div class="performance-change trend-up">
+                <i class="fas fa-arrow-up"></i> Monthly growth
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Grid -->
+    <div class="dashboard-grid">
+        <!-- Charts Row -->
+        <div class="dashboard-row">
+            <!-- Lead Generation Trends -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-chart-line"></i> Lead Generation Trends</h3>
+                    <div class="chart-filters">
+                        <button class="chart-filter-btn active" data-chart="leads" data-period="30d">30 Days</button>
+                        <button class="chart-filter-btn" data-chart="leads" data-period="90d">90 Days</button>
+                        <button class="chart-filter-btn" data-chart="leads" data-period="1y">1 Year</button>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="leadsAnalyticsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue Analytics -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-rupee-sign"></i> Revenue Analytics</h3>
+                    <div class="chart-filters">
+                        <button class="chart-filter-btn active" data-chart="revenue" data-period="30d">30 Days</button>
+                        <button class="chart-filter-btn" data-chart="revenue" data-period="90d">90 Days</button>
+                        <button class="chart-filter-btn" data-chart="revenue" data-period="1y">1 Year</button>
+                    </div>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Second Charts Row -->
+        <div class="dashboard-row">
+            <!-- Service Request Distribution -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-tools"></i> Service Request Distribution</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="serviceDistributionChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Lead Sources -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-funnel-dollar"></i> Lead Sources Performance</h3>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="leadSourcesChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detailed Analytics Row -->
+        <div class="dashboard-row">
+            <!-- Conversion Funnel -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-filter"></i> Sales Conversion Funnel</h3>
+                    <p class="card-subtitle">Track leads through the conversion process</p>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="conversionFunnelChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Monthly Performance -->
+            <div class="chart-container">
+                <div class="chart-header">
+                    <h3><i class="fas fa-calendar-alt"></i> Monthly Performance Comparison</h3>
+                    <p class="card-subtitle">Compare current month with previous periods</p>
+                </div>
+                <div class="chart-canvas">
+                    <canvas id="monthlyComparisonChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analytics Tables -->
+    <div class="dashboard-row">
+        <!-- Top Performing Lead Sources -->
+        <div class="data-table-container">
+            <div class="data-table-header">
+                <h3><i class="fas fa-trophy"></i> Top Performing Lead Sources</h3>
+                <p class="card-subtitle">Lead sources ranked by conversion rate and volume</p>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Total Leads</th>
+                        <th>Conversions</th>
+                        <th>Conversion Rate</th>
+                        <th>Revenue Generated</th>
+                        <th>Avg. Deal Size</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-success">Website</span></td>
+                        <td>145</td>
+                        <td>32</td>
+                        <td><strong class="text-success">22.1%</strong></td>
+                        <td>₹18,50,000</td>
+                        <td>₹57,812</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-info">Referral</span></td>
+                        <td>89</td>
+                        <td>28</td>
+                        <td><strong class="text-success">31.5%</strong></td>
+                        <td>₹21,40,000</td>
+                        <td>₹76,428</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-warning">Social Media</span></td>
+                        <td>67</td>
+                        <td>12</td>
+                        <td><strong class="text-warning">17.9%</strong></td>
+                        <td>₹8,90,000</td>
+                        <td>₹74,166</td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-secondary">Direct</span></td>
+                        <td>34</td>
+                        <td>8</td>
+                        <td><strong class="text-warning">23.5%</strong></td>
+                        <td>₹6,20,000</td>
+                        <td>₹77,500</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Service Performance Metrics -->
+        <div class="data-table-container">
+            <div class="data-table-header">
+                <h3><i class="fas fa-cogs"></i> Service Performance Metrics</h3>
+                <p class="card-subtitle">Service request handling and resolution statistics</p>
+            </div>
+            
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Service Type</th>
+                        <th>Total Requests</th>
+                        <th>Resolved</th>
+                        <th>Avg. Resolution Time</th>
+                        <th>Customer Rating</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="badge badge-warning">Maintenance</span></td>
+                        <td>78</td>
+                        <td>72</td>
+                        <td>2.3 days</td>
+                        <td><strong class="text-success">4.6/5</strong></td>
+                        <td><span class="badge badge-success">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-danger">Repair</span></td>
+                        <td>45</td>
+                        <td>41</td>
+                        <td>1.8 days</td>
+                        <td><strong class="text-success">4.4/5</strong></td>
+                        <td><span class="badge badge-success">Good</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-info">Installation</span></td>
+                        <td>23</td>
+                        <td>21</td>
+                        <td>5.2 days</td>
+                        <td><strong class="text-success">4.7/5</strong></td>
+                        <td><span class="badge badge-success">Excellent</span></td>
+                    </tr>
+                    <tr>
+                        <td><span class="badge badge-success">Consultation</span></td>
+                        <td>56</td>
+                        <td>54</td>
+                        <td>0.8 days</td>
+                        <td><strong class="text-success">4.8/5</strong></td>
+                        <td><span class="badge badge-success">Excellent</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Export and Actions -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-download"></i> Export & Reports</h3>
+            <p class="card-subtitle">Generate detailed reports and export analytics data</p>
+        </div>
+        
+        <div class="quick-actions-grid">
+            <button class="quick-action-btn" onclick="exportAnalytics('leads')">
+                <i class="fas fa-user-plus"></i>
+                <span>Export Leads Report</span>
+            </button>
+            
+            <button class="quick-action-btn" onclick="exportAnalytics('revenue')">
+                <i class="fas fa-rupee-sign"></i>
+                <span>Export Revenue Report</span>
+            </button>
+            
+            <button class="quick-action-btn" onclick="exportAnalytics('services')">
+                <i class="fas fa-tools"></i>
+                <span>Export Service Report</span>
+            </button>
+            
+            <a href="{% url 'admin:reports' %}" class="quick-action-btn">
+                <i class="fas fa-chart-pie"></i>
+                <span>Detailed Reports</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all charts
+    initializeLeadsAnalyticsChart();
+    initializeRevenueChart();
+    initializeServiceDistributionChart();
+    initializeLeadSourcesChart();
+    initializeConversionFunnelChart();
+    initializeMonthlyComparisonChart();
+    
+    // Chart filter buttons
+    document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remove active class from siblings
+            this.parentNode.querySelectorAll('.chart-filter-btn').forEach(b => b.classList.remove('active'));
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Update chart data based on period and chart type
+            const chartType = this.dataset.chart;
+            const period = this.dataset.period;
+            updateChart(chartType, period);
+        });
+    });
+});
+
+function initializeLeadsAnalyticsChart() {
+    const ctx = document.getElementById('leadsAnalyticsChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'New Leads',
+                data: [25, 32, 28, 35],
+                borderColor: '#fdd835',
+                backgroundColor: 'rgba(253, 216, 53, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Qualified Leads',
+                data: [18, 24, 21, 26],
+                borderColor: '#4CAF50',
+                backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeRevenueChart() {
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+            datasets: [{
+                label: 'Revenue (₹ Lakhs)',
+                data: [12.5, 18.3, 15.7, 22.1],
+                backgroundColor: 'rgba(76, 175, 80, 0.8)',
+                borderColor: '#4CAF50',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeServiceDistributionChart() {
+    const ctx = document.getElementById('serviceDistributionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Maintenance', 'Repair', 'Installation', 'Consultation'],
+            datasets: [{
+                data: [78, 45, 23, 56],
+                backgroundColor: [
+                    '#ff9800',
+                    '#f44336',
+                    '#2196F3',
+                    '#4CAF50'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeLeadSourcesChart() {
+    const ctx = document.getElementById('leadSourcesChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'horizontalBar',
+        data: {
+            labels: ['Website', 'Referral', 'Social Media', 'Direct'],
+            datasets: [{
+                label: 'Leads',
+                data: [145, 89, 67, 34],
+                backgroundColor: [
+                    'rgba(76, 175, 80, 0.8)',
+                    'rgba(33, 150, 243, 0.8)',
+                    'rgba(255, 152, 0, 0.8)',
+                    'rgba(158, 158, 158, 0.8)'
+                ],
+                borderColor: [
+                    '#4CAF50',
+                    '#2196F3',
+                    '#ff9800',
+                    '#9e9e9e'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                y: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeConversionFunnelChart() {
+    const ctx = document.getElementById('conversionFunnelChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Leads', 'Qualified', 'Quoted', 'Negotiation', 'Closed'],
+            datasets: [{
+                label: 'Count',
+                data: [335, 248, 156, 89, 67],
+                backgroundColor: [
+                    'rgba(33, 150, 243, 0.8)',
+                    'rgba(255, 152, 0, 0.8)',
+                    'rgba(253, 216, 53, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(76, 175, 80, 0.8)'
+                ],
+                borderColor: [
+                    '#2196F3',
+                    '#ff9800',
+                    '#fdd835',
+                    '#FFC107',
+                    '#4CAF50'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function initializeMonthlyComparisonChart() {
+    const ctx = document.getElementById('monthlyComparisonChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'This Year',
+                data: [45, 52, 48, 61, 58, 67],
+                borderColor: '#fdd835',
+                backgroundColor: 'rgba(253, 216, 53, 0.1)',
+                borderWidth: 3,
+                fill: false,
+                tension: 0.4
+            }, {
+                label: 'Last Year',
+                data: [38, 42, 41, 48, 46, 52],
+                borderColor: '#9e9e9e',
+                backgroundColor: 'rgba(158, 158, 158, 0.1)',
+                borderWidth: 2,
+                fill: false,
+                tension: 0.4,
+                borderDash: [5, 5]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0,0,0,0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateChart(chartType, period) {
+    // Fetch new data based on chart type and period
+    fetch(`{% url 'admin:chart_data_api' 'analytics' %}?chart=${chartType}&period=${period}`)
+        .then(response => response.json())
+        .then(data => {
+            // Update the appropriate chart with new data
+            console.log(`Updating ${chartType} chart with ${period} data:`, data);
+        })
+        .catch(error => console.error('Error updating chart:', error));
+}
+
+function exportAnalytics(type) {
+    // Placeholder for export functionality
+    alert(`Exporting ${type} analytics report. This functionality will be implemented in a future update.`);
+}
+</script>
+{% endblock %}

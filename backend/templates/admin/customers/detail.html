@@ -1,0 +1,429 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+{% if customer.lead %}{{ customer.lead.first_name }} {{ customer.lead.last_name }}{% else %}Customer #{{ customer.id }}{% endif %} - Customer Details
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'admin/css/dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-user"></i>
+            {% if customer.lead %}
+            {{ customer.lead.first_name }} {{ customer.lead.last_name }}
+            {% else %}
+            Customer #{{ customer.id }}
+            {% endif %}
+        </h1>
+        <p class="subtitle">Customer Details and Project History</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 mb-3">
+        <a href="{% url 'admin:customers' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Customers
+        </a>
+        <a href="{% url 'admin:customer_edit' customer.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Customer
+        </a>
+        <a href="{% url 'admin:service_create' %}?customer={{ customer.pk }}" class="btn btn-success">
+            <i class="fas fa-tools"></i> New Service Request
+        </a>
+        <a href="{% url 'admin:customer_delete' customer.pk %}" class="btn btn-danger" data-confirm-delete>
+            <i class="fas fa-trash"></i> Delete Customer
+        </a>
+    </div>
+
+    <!-- Customer Overview Cards -->
+    <div class="metrics-grid">
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>₹{{ customer.total_value|floatformat:0 }}</h3>
+                    <p>Total Project Value</p>
+                </div>
+                <div class="metric-icon revenue">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>₹{{ customer.outstanding_amount|floatformat:0 }}</h3>
+                    <p>Outstanding Amount</p>
+                </div>
+                <div class="metric-icon {% if customer.outstanding_amount > 0 %}services{% else %}customers{% endif %}">
+                    <i class="fas fa-{% if customer.outstanding_amount > 0 %}exclamation-triangle{% else %}check-circle{% endif %}"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>{{ installation_projects.count }}</h3>
+                    <p>Installation Projects</p>
+                </div>
+                <div class="metric-icon leads">
+                    <i class="fas fa-solar-panel"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="metric-card-enhanced">
+            <div class="metric-header">
+                <div class="metric-content">
+                    <h3>{{ service_requests.count }}</h3>
+                    <p>Service Requests</p>
+                </div>
+                <div class="metric-icon services">
+                    <i class="fas fa-tools"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Customer Information Grid -->
+    <div class="form-grid">
+        <!-- Basic Information -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user"></i> Basic Information</h3>
+            </div>
+            
+            {% if customer.lead %}
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <div class="form-control" readonly>{{ customer.lead.first_name }} {{ customer.lead.last_name }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="form-control" readonly>
+                    <a href="mailto:{{ customer.lead.email }}">{{ customer.lead.email }}</a>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <div class="form-control" readonly>
+                    <a href="tel:{{ customer.lead.phone }}">{{ customer.lead.phone }}</a>
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if customer.company_name %}
+            <div class="form-group">
+                <label class="form-label">Company Name</label>
+                <div class="form-control" readonly>{{ customer.company_name }}</div>
+            </div>
+            {% endif %}
+            
+            <div class="form-group">
+                <label class="form-label">Customer Type</label>
+                <div class="form-control" readonly>
+                    {% if customer.customer_type == 'residential' %}
+                    <span class="badge badge-info">Residential</span>
+                    {% elif customer.customer_type == 'commercial' %}
+                    <span class="badge badge-warning">Commercial</span>
+                    {% elif customer.customer_type == 'industrial' %}
+                    <span class="badge badge-success">Industrial</span>
+                    {% else %}
+                    <span class="badge badge-secondary">{{ customer.customer_type|title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Information -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-map-marker-alt"></i> Address Information</h3>
+            </div>
+            
+            {% if customer.address %}
+            <div class="form-group">
+                <label class="form-label">Address</label>
+                <div class="form-control" readonly>{{ customer.address }}</div>
+            </div>
+            {% endif %}
+            
+            <div class="form-grid-2">
+                {% if customer.city %}
+                <div class="form-group">
+                    <label class="form-label">City</label>
+                    <div class="form-control" readonly>{{ customer.city }}</div>
+                </div>
+                {% endif %}
+                
+                {% if customer.state %}
+                <div class="form-group">
+                    <label class="form-label">State</label>
+                    <div class="form-control" readonly>{{ customer.state }}</div>
+                </div>
+                {% endif %}
+            </div>
+            
+            {% if customer.pincode %}
+            <div class="form-group">
+                <label class="form-label">Pincode</label>
+                <div class="form-control" readonly>{{ customer.pincode }}</div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Status and Timeline -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-info-circle"></i> Status & Timeline</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Status</label>
+                <div class="form-control" readonly>
+                    {% if customer.status == 'active' %}
+                    <span class="badge badge-success">Active</span>
+                    {% elif customer.status == 'inactive' %}
+                    <span class="badge badge-secondary">Inactive</span>
+                    {% elif customer.status == 'pending' %}
+                    <span class="badge badge-warning">Pending</span>
+                    {% else %}
+                    <span class="badge badge-info">{{ customer.status|title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Customer Since</label>
+                <div class="form-control" readonly>
+                    {{ customer.created_at|date:"F d, Y" }}
+                    <small class="text-muted">({{ customer.created_at|timesince }} ago)</small>
+                </div>
+            </div>
+            
+            {% if customer.lead and customer.lead.converted_at %}
+            <div class="form-group">
+                <label class="form-label">Converted From Lead</label>
+                <div class="form-control" readonly>
+                    {{ customer.lead.converted_at|date:"F d, Y H:i" }}
+                    <br><small class="text-muted">Source: {{ customer.lead.source.name }}</small>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Installation Projects -->
+    {% if installation_projects %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-solar-panel"></i> Installation Projects</h3>
+            <p class="card-subtitle">Solar installation projects for this customer</p>
+        </div>
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Project #</th>
+                        <th>System Details</th>
+                        <th>Status</th>
+                        <th>Progress</th>
+                        <th>Value</th>
+                        <th>Dates</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for project in installation_projects %}
+                    <tr>
+                        <td><strong>{{ project.project_number }}</strong></td>
+                        <td>
+                            <div>{{ project.system_capacity }} kW</div>
+                            <small class="text-muted">{{ project.panel_brand }} / {{ project.inverter_brand }}</small>
+                        </td>
+                        <td>
+                            <span class="badge badge-{% if project.status == 'completed' %}success{% elif project.status == 'in_progress' %}warning{% else %}info{% endif %}">
+                                {{ project.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar bg-success" style="width: {{ project.progress_percentage }}%">
+                                    {{ project.progress_percentage }}%
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <strong>₹{{ project.project_value|floatformat:0 }}</strong>
+                            <br><small class="text-muted">Paid: ₹{{ project.amount_paid|floatformat:0 }}</small>
+                        </td>
+                        <td>
+                            {% if project.completion_date %}
+                            <div>Completed: {{ project.completion_date|date:"M d, Y" }}</div>
+                            {% elif project.installation_start_date %}
+                            <div>Started: {{ project.installation_start_date|date:"M d, Y" }}</div>
+                            {% elif project.approval_date %}
+                            <div>Approved: {{ project.approval_date|date:"M d, Y" }}</div>
+                            {% else %}
+                            <div>Created: {{ project.created_at|date:"M d, Y" }}</div>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- AMC Contracts -->
+    {% if amc_contracts %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-file-contract"></i> AMC Contracts</h3>
+            <p class="card-subtitle">Annual Maintenance Contracts</p>
+        </div>
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Contract #</th>
+                        <th>Status</th>
+                        <th>Period</th>
+                        <th>Annual Value</th>
+                        <th>Renewal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contract in amc_contracts %}
+                    <tr>
+                        <td><strong>{{ contract.contract_number }}</strong></td>
+                        <td>
+                            <span class="badge badge-{% if contract.status == 'active' %}success{% elif contract.status == 'expired' %}danger{% else %}warning{% endif %}">
+                                {{ contract.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            {{ contract.start_date|date:"M d, Y" }} - {{ contract.end_date|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <strong>₹{{ contract.annual_value|floatformat:0 }}</strong>
+                        </td>
+                        <td>
+                            {% if contract.end_date < today %}
+                            <span class="badge badge-danger">Expired</span>
+                            {% else %}
+                            <span class="text-muted">{{ contract.end_date|timeuntil }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Service Requests -->
+    {% if service_requests %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-tools"></i> Service Requests</h3>
+            <p class="card-subtitle">Recent service requests and support tickets</p>
+        </div>
+        
+        <div class="table-container">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Ticket #</th>
+                        <th>Subject</th>
+                        <th>Type</th>
+                        <th>Priority</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in service_requests %}
+                    <tr>
+                        <td><strong>{{ service.ticket_number }}</strong></td>
+                        <td>{{ service.subject }}</td>
+                        <td>
+                            <span class="badge badge-info">{{ service.get_request_type_display }}</span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{% if service.priority == 'high' %}danger{% elif service.priority == 'medium' %}warning{% else %}secondary{% endif %}">
+                                {{ service.get_priority_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge badge-{% if service.status == 'resolved' %}success{% elif service.status == 'in_progress' %}warning{% else %}info{% endif %}">
+                                {{ service.get_status_display }}
+                            </span>
+                        </td>
+                        <td>
+                            <div>{{ service.created_at|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ service.created_at|timesince }} ago</small>
+                        </td>
+                        <td>
+                            <a href="{% url 'admin:service_detail' service.pk %}" class="btn btn-sm btn-secondary">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Empty States -->
+    {% if not installation_projects and not amc_contracts and not service_requests %}
+    <div class="card mt-3">
+        <div class="text-center" style="padding: 60px 20px;">
+            <i class="fas fa-clipboard-list" style="font-size: 3rem; color: #ddd; margin-bottom: 20px;"></i>
+            <h3>No Projects or Services Yet</h3>
+            <p class="text-muted">This customer doesn't have any projects or service requests yet.</p>
+            <a href="{% url 'admin:service_create' %}?customer={{ customer.pk }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Service Request
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add progress bar styling
+    const progressBars = document.querySelectorAll('.progress-bar');
+    progressBars.forEach(bar => {
+        const percentage = parseInt(bar.style.width);
+        if (percentage === 100) {
+            bar.classList.remove('bg-success');
+            bar.classList.add('bg-success');
+        } else if (percentage >= 50) {
+            bar.classList.remove('bg-success');
+            bar.classList.add('bg-warning');
+        } else {
+            bar.classList.remove('bg-success');
+            bar.classList.add('bg-info');
+        }
+    });
+});
+</script>
+{% endblock %}

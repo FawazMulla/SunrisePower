@@ -43,6 +43,8 @@ LOCAL_APPS = [
     'apps.analytics',
     'apps.integrations',
     'apps.audit',
+    'apps.admin_interface',
+    'apps.frontend',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -51,12 +53,16 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',  # Static files
     'corsheaders.middleware.CorsMiddleware',  # CORS
+    'apps.integrations.middleware.HealthCheckMiddleware',  # Health checks
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'apps.audit.middleware.AuditMiddleware',  # Audit logging
+    'apps.integrations.middleware.PerformanceTrackingMiddleware',  # Performance tracking
     'django.contrib.messages.middleware.MessageMiddleware',
+    'apps.integrations.middleware.ErrorRecoveryMiddleware',  # Error recovery
+    'apps.integrations.middleware.SecurityHeadersMiddleware',  # Security headers
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
@@ -215,6 +221,13 @@ LOGGING = {
 
 # EmailJS Integration
 EMAILJS_WEBHOOK_SECRET = config('EMAILJS_WEBHOOK_SECRET', default='development-webhook-secret')
+
+# Admin emails for alerts
+ADMIN_EMAILS = config('ADMIN_EMAILS', default='admin@sunrisepower.com', cast=lambda v: [s.strip() for s in v.split(',')])
+
+# Email settings
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@sunrisepower.com')
+EMAIL_BACKEND = config('EMAIL_BACKEND', default='django.core.mail.backends.console.EmailBackend')
 
 # Custom settings
 FRONTEND_DIR = config('FRONTEND_DIR', default='../frontend')

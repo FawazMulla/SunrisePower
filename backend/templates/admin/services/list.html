@@ -1,0 +1,268 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}Service Requests - Solar CRM Admin{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-tools"></i> Service Requests</h1>
+        <p class="subtitle">Manage customer service requests and support tickets</p>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="search-filters">
+        <form method="get" class="search-form">
+            <div class="search-row">
+                <div class="search-field">
+                    <label class="form-label">Search</label>
+                    <input type="text" name="search" class="form-control" 
+                           placeholder="Search by ticket #, subject, or customer..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                
+                <div class="search-field">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-control">
+                        <option value="">All Statuses</option>
+                        <option value="open" {% if request.GET.status == 'open' %}selected{% endif %}>Open</option>
+                        <option value="in_progress" {% if request.GET.status == 'in_progress' %}selected{% endif %}>In Progress</option>
+                        <option value="resolved" {% if request.GET.status == 'resolved' %}selected{% endif %}>Resolved</option>
+                        <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                
+                <div class="search-field">
+                    <label class="form-label">Priority</label>
+                    <select name="priority" class="form-control">
+                        <option value="">All Priorities</option>
+                        <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+                        <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                        <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                    </select>
+                </div>
+                
+                <div class="search-field">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search"></i> Search
+                    </button>
+                    <a href="{% url 'admin:services' %}" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Clear
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Actions Bar -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <span class="text-muted">{{ paginator.count }} service request{{ paginator.count|pluralize }} found</span>
+        </div>
+        <div>
+            <a href="{% url 'admin:service_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Service Request
+            </a>
+        </div>
+    </div>
+
+    <!-- Service Requests Table -->
+    <div class="data-table-container">
+        <div class="data-table-header">
+            <h3><i class="fas fa-list"></i> Service Requests</h3>
+            <div class="table-actions">
+                <button class="btn btn-sm btn-secondary" onclick="exportServices()">
+                    <i class="fas fa-download"></i> Export
+                </button>
+            </div>
+        </div>
+        
+        {% if service_requests %}
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ticket #</th>
+                    <th>Customer</th>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Priority</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for service in service_requests %}
+                <tr>
+                    <td>
+                        <strong>{{ service.ticket_number }}</strong>
+                    </td>
+                    <td>
+                        {% if service.customer.lead %}
+                        <div>
+                            <strong>{{ service.customer.lead.first_name }} {{ service.customer.lead.last_name }}</strong>
+                        </div>
+                        <small class="text-muted">{{ service.customer.lead.email }}</small>
+                        {% else %}
+                        <div>Customer #{{ service.customer.id }}</div>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ service.subject }}</div>
+                        {% if service.description %}
+                        <small class="text-muted">{{ service.description|truncatechars:50 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if service.request_type == 'maintenance' %}
+                        <span class="badge badge-warning">Maintenance</span>
+                        {% elif service.request_type == 'repair' %}
+                        <span class="badge badge-danger">Repair</span>
+                        {% elif service.request_type == 'installation' %}
+                        <span class="badge badge-info">Installation</span>
+                        {% elif service.request_type == 'consultation' %}
+                        <span class="badge badge-success">Consultation</span>
+                        {% else %}
+                        <span class="badge badge-secondary">{{ service.get_request_type_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if service.priority == 'high' %}
+                        <span class="badge badge-danger">High</span>
+                        {% elif service.priority == 'medium' %}
+                        <span class="badge badge-warning">Medium</span>
+                        {% elif service.priority == 'low' %}
+                        <span class="badge badge-secondary">Low</span>
+                        {% else %}
+                        <span class="badge badge-info">{{ service.get_priority_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if service.status == 'open' %}
+                        <span class="badge badge-info">Open</span>
+                        {% elif service.status == 'in_progress' %}
+                        <span class="badge badge-warning">In Progress</span>
+                        {% elif service.status == 'resolved' %}
+                        <span class="badge badge-success">Resolved</span>
+                        {% elif service.status == 'closed' %}
+                        <span class="badge badge-secondary">Closed</span>
+                        {% else %}
+                        <span class="badge badge-info">{{ service.get_status_display }}</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if service.assigned_to %}
+                        <div>{{ service.assigned_to.get_full_name|default:service.assigned_to.username }}</div>
+                        {% else %}
+                        <span class="text-muted">Unassigned</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div>{{ service.created_at|date:"M d, Y" }}</div>
+                        <small class="text-muted">{{ service.created_at|time:"H:i" }}</small>
+                        <br><small class="text-muted">{{ service.created_at|timesince }} ago</small>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <a href="{% url 'admin:service_detail' service.pk %}" class="btn btn-sm btn-secondary" title="View Details">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'admin:service_edit' service.pk %}" class="btn btn-sm btn-primary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            {% if service.status != 'closed' %}
+                            <button class="btn btn-sm btn-success" title="Mark as Resolved" 
+                                    onclick="updateServiceStatus({{ service.pk }}, 'resolved')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            {% endif %}
+                            <a href="{% url 'admin:service_delete' service.pk %}" class="btn btn-sm btn-danger" 
+                               title="Delete" data-confirm-delete>
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center" style="padding: 60px 20px;">
+            <i class="fas fa-tools" style="font-size: 3rem; color: #ddd; margin-bottom: 20px;"></i>
+            <h3>No service requests found</h3>
+            <p class="text-muted">No service requests match your current filters.</p>
+            <a href="{% url 'admin:service_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create First Service Request
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; First</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">&lsaquo; Previous</a>
+        {% endif %}
+        
+        <span class="current">
+            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">Next &rsaquo;</a>
+            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function exportServices() {
+    // Placeholder for export functionality
+    alert('Export functionality will be implemented in a future update.');
+}
+
+function updateServiceStatus(serviceId, status) {
+    if (confirm(`Mark this service request as ${status}?`)) {
+        // This would typically make an AJAX call to update the status
+        // For now, we'll redirect to the edit page
+        window.location.href = `/admin/services/${serviceId}/edit/`;
+    }
+}
+
+// Auto-submit form on filter change
+document.addEventListener('DOMContentLoaded', function() {
+    const statusSelect = document.querySelector('select[name="status"]');
+    const prioritySelect = document.querySelector('select[name="priority"]');
+    
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+    
+    if (prioritySelect) {
+        prioritySelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+    
+    // Highlight high priority items
+    document.querySelectorAll('.badge-danger').forEach(badge => {
+        if (badge.textContent.trim() === 'High') {
+            badge.closest('tr').style.borderLeft = '3px solid #f44336';
+        }
+    });
+});
+</script>
+{% endblock %}

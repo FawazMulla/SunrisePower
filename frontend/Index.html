@@ -113,6 +113,200 @@
   </div>
 </section>
 
+<!-- Solar Calculator Section -->
+<section class="calculator-section" style="
+  background: linear-gradient(135deg, #fcf8f0 0%, #f5f1e8 100%);
+  padding: 60px 20px;
+  margin: 40px 0;
+">
+  <div class="container" style="max-width: 800px; margin: 0 auto;">
+    <h2 style="
+      text-align: center;
+      color: #3D2B1F;
+      margin-bottom: 20px;
+      font-size: 2.5rem;
+      font-weight: 600;
+    ">Solar Savings Calculator</h2>
+    <p style="
+      text-align: center;
+      color: #666;
+      margin-bottom: 40px;
+      font-size: 1.1rem;
+    ">Calculate your potential savings with solar energy</p>
+    
+    <div class="calculator-form" style="
+      background: white;
+      padding: 40px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    ">
+      <form id="solar-calculator-form">
+        <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label for="monthly-bill" style="
+              display: block;
+              margin-bottom: 8px;
+              color: #3D2B1F;
+              font-weight: 500;
+            ">Monthly Electricity Bill (₹)</label>
+            <input type="number" id="monthly-bill" name="monthly_bill" required style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #e0e0e0;
+              border-radius: 8px;
+              font-size: 1rem;
+              transition: border-color 0.3s;
+            " placeholder="e.g., 3000">
+          </div>
+          
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label for="property-type" style="
+              display: block;
+              margin-bottom: 8px;
+              color: #3D2B1F;
+              font-weight: 500;
+            ">Property Type</label>
+            <select id="property-type" name="property_type" required style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #e0e0e0;
+              border-radius: 8px;
+              font-size: 1rem;
+              background: white;
+            ">
+              <option value="">Select Property Type</option>
+              <option value="residential">Residential</option>
+              <option value="commercial">Commercial</option>
+              <option value="industrial">Industrial</option>
+            </select>
+          </div>
+        </div>
+        
+        <div class="form-row" style="display: flex; gap: 20px; margin-bottom: 20px; flex-wrap: wrap;">
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label for="roof-area" style="
+              display: block;
+              margin-bottom: 8px;
+              color: #3D2B1F;
+              font-weight: 500;
+            ">Available Roof Area (sq ft)</label>
+            <input type="number" id="roof-area" name="roof_area" required style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #e0e0e0;
+              border-radius: 8px;
+              font-size: 1rem;
+            " placeholder="e.g., 500">
+          </div>
+          
+          <div class="form-group" style="flex: 1; min-width: 200px;">
+            <label for="location" style="
+              display: block;
+              margin-bottom: 8px;
+              color: #3D2B1F;
+              font-weight: 500;
+            ">Location</label>
+            <input type="text" id="location" name="location" required style="
+              width: 100%;
+              padding: 12px;
+              border: 2px solid #e0e0e0;
+              border-radius: 8px;
+              font-size: 1rem;
+            " placeholder="e.g., Nanded, Maharashtra">
+          </div>
+        </div>
+        
+        <button type="button" id="calculate-btn" style="
+          width: 100%;
+          background: #fdd835;
+          color: #3D2B1F;
+          padding: 15px;
+          border: none;
+          border-radius: 8px;
+          font-size: 1.1rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s;
+          margin-bottom: 20px;
+        " onmouseover="this.style.background='#ffeb7b'" onmouseout="this.style.background='#fdd835'">
+          Calculate Savings
+        </button>
+      </form>
+      
+      <div id="calculator-results" style="display: none; margin-top: 30px;">
+        <div style="
+          background: linear-gradient(135deg, #fdd835 0%, #ffeb7b 100%);
+          padding: 25px;
+          border-radius: 10px;
+          text-align: center;
+        ">
+          <h3 style="color: #3D2B1F; margin-bottom: 15px;">Your Solar Savings Estimate</h3>
+          <div class="results-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 20px;">
+            <div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #3D2B1F;" id="system-capacity">-</div>
+              <div style="font-size: 0.9rem; color: #666;">System Size (kW)</div>
+            </div>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #3D2B1F;" id="annual-savings">-</div>
+              <div style="font-size: 0.9rem; color: #666;">Annual Savings (₹)</div>
+            </div>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #3D2B1F;" id="system-cost">-</div>
+              <div style="font-size: 0.9rem; color: #666;">System Cost (₹)</div>
+            </div>
+            <div>
+              <div style="font-size: 1.5rem; font-weight: bold; color: #3D2B1F;" id="payback-period">-</div>
+              <div style="font-size: 0.9rem; color: #666;">Payback Period</div>
+            </div>
+          </div>
+          
+          <div id="contact-form-section" style="margin-top: 25px; padding-top: 20px; border-top: 2px solid rgba(61, 43, 31, 0.2);">
+            <p style="color: #3D2B1F; margin-bottom: 15px; font-weight: 500;">Get a detailed quote for your solar installation</p>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;">
+              <input type="text" id="contact-name" placeholder="Your Name" style="
+                padding: 10px;
+                border: 2px solid #3D2B1F;
+                border-radius: 5px;
+                flex: 1;
+                min-width: 150px;
+                max-width: 200px;
+              ">
+              <input type="email" id="contact-email" placeholder="Email Address" style="
+                padding: 10px;
+                border: 2px solid #3D2B1F;
+                border-radius: 5px;
+                flex: 1;
+                min-width: 150px;
+                max-width: 200px;
+              ">
+              <input type="tel" id="contact-phone" placeholder="Phone Number" style="
+                padding: 10px;
+                border: 2px solid #3D2B1F;
+                border-radius: 5px;
+                flex: 1;
+                min-width: 150px;
+                max-width: 200px;
+              ">
+              <button type="button" id="get-quote-btn" style="
+                background: #3D2B1F;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: 500;
+                transition: background 0.3s;
+              " onmouseover="this.style.background='#5a4031'" onmouseout="this.style.background='#3D2B1F'">
+                Get Quote
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- 🌞 Slideshow Section Above Footer -->
  <!-- <section class="slideshow-wrapper" style="display: flex; justify-content: center; align-items: center; width: 100%; margin: 40px 0;"></section>
 <section class="slideshow-section">
@@ -338,6 +532,178 @@ function showSlides() {
   dots[slideIndex - 1].classList.add("active1");
   setTimeout(showSlides, 4000); // Change image every 4 seconds
 }
+</script>
+
+<!-- Solar Calculator Script -->
+<script>
+class SolarCalculator {
+    constructor() {
+        this.sessionId = this.generateSessionId();
+        this.initEventListeners();
+    }
+
+    generateSessionId() {
+        return 'calc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+
+    initEventListeners() {
+        const calculateBtn = document.getElementById('calculate-btn');
+        const getQuoteBtn = document.getElementById('get-quote-btn');
+
+        if (calculateBtn) {
+            calculateBtn.addEventListener('click', () => this.calculateSavings());
+        }
+
+        if (getQuoteBtn) {
+            getQuoteBtn.addEventListener('click', () => this.submitCalculatorData());
+        }
+    }
+
+    calculateSavings() {
+        // Get form values
+        const monthlyBill = parseFloat(document.getElementById('monthly-bill').value);
+        const propertyType = document.getElementById('property-type').value;
+        const roofArea = parseFloat(document.getElementById('roof-area').value);
+        const location = document.getElementById('location').value;
+
+        // Validate inputs
+        if (!monthlyBill || !propertyType || !roofArea || !location) {
+            alert('Please fill in all fields to calculate your savings.');
+            return;
+        }
+
+        // Simple calculation logic (can be made more sophisticated)
+        const annualBill = monthlyBill * 12;
+        const unitsPerMonth = monthlyBill / 8; // Assuming ₹8 per unit average
+        const annualUnits = unitsPerMonth * 12;
+        
+        // System sizing (rough estimate: 1kW generates ~1500 units/year in India)
+        const systemCapacity = Math.round((annualUnits / 1500) * 10) / 10;
+        
+        // Cost estimation (₹60,000 per kW average)
+        const systemCost = Math.round(systemCapacity * 60000);
+        
+        // Savings (assuming 80% of electricity bill can be offset)
+        const annualSavings = Math.round(annualBill * 0.8);
+        
+        // Payback period
+        const paybackYears = Math.round((systemCost / annualSavings) * 10) / 10;
+
+        // Store calculation results
+        this.calculationResults = {
+            system_capacity_kw: systemCapacity,
+            total_system_cost: systemCost,
+            annual_savings: annualSavings,
+            payback_period_years: paybackYears,
+            monthly_bill: monthlyBill,
+            annual_units: annualUnits
+        };
+
+        this.userInputs = {
+            monthly_bill: monthlyBill,
+            property_type: propertyType,
+            roof_area: roofArea,
+            location: location
+        };
+
+        // Display results
+        this.displayResults();
+    }
+
+    displayResults() {
+        const resultsDiv = document.getElementById('calculator-results');
+        
+        // Update result values
+        document.getElementById('system-capacity').textContent = this.calculationResults.system_capacity_kw + ' kW';
+        document.getElementById('annual-savings').textContent = '₹' + this.calculationResults.annual_savings.toLocaleString();
+        document.getElementById('system-cost').textContent = '₹' + this.calculationResults.total_system_cost.toLocaleString();
+        document.getElementById('payback-period').textContent = this.calculationResults.payback_period_years + ' years';
+
+        // Show results
+        resultsDiv.style.display = 'block';
+        
+        // Smooth scroll to results
+        resultsDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    async submitCalculatorData() {
+        // Get contact information
+        const name = document.getElementById('contact-name').value.trim();
+        const email = document.getElementById('contact-email').value.trim();
+        const phone = document.getElementById('contact-phone').value.trim();
+
+        // Validate contact info
+        if (!name || !email || !phone) {
+            alert('Please provide your contact information to get a detailed quote.');
+            return;
+        }
+
+        // Prepare data for submission
+        const calculatorData = {
+            session_id: this.sessionId,
+            calculation_results: this.calculationResults,
+            user_inputs: this.userInputs,
+            user_info: {
+                first_name: name.split(' ')[0],
+                last_name: name.split(' ').slice(1).join(' '),
+                email: email,
+                phone: phone
+            },
+            timestamp: new Date().toISOString()
+        };
+
+        try {
+            // Send to CRM API (invisible to user)
+            const response = await fetch('/api/integrations/webhooks/calculator/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': this.getCSRFToken()
+                },
+                body: JSON.stringify(calculatorData)
+            });
+
+            if (response.ok) {
+                // Show success message
+                alert('Thank you! Your quote request has been submitted. Our team will contact you within 24 hours with a detailed proposal.');
+                
+                // Clear contact form
+                document.getElementById('contact-name').value = '';
+                document.getElementById('contact-email').value = '';
+                document.getElementById('contact-phone').value = '';
+                
+                console.log('Calculator data sent to CRM successfully');
+            } else {
+                throw new Error('Failed to submit quote request');
+            }
+        } catch (error) {
+            console.warn('Error sending calculator data to CRM:', error);
+            // Still show success to user - don't disrupt experience
+            alert('Thank you for your interest! Please call us at +91-XXXXXXXXXX for immediate assistance.');
+        }
+    }
+
+    getCSRFToken() {
+        // Get CSRF token from cookie or meta tag
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('csrftoken='))
+            ?.split('=')[1];
+        
+        if (cookieValue) {
+            return cookieValue;
+        }
+
+        // Fallback: get from meta tag
+        const metaTag = document.querySelector('meta[name="csrf-token"]');
+        return metaTag ? metaTag.getAttribute('content') : '';
+    }
+}
+
+// Initialize calculator when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    window.solarCalculator = new SolarCalculator();
+});
 </script>
 
 </body>

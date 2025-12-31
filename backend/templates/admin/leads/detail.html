@@ -1,0 +1,264 @@
+{% extends 'base/admin_base.html' %}
+{% load static %}
+
+{% block title %}{{ lead.first_name }} {{ lead.last_name }} - Lead Details{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'admin/css/forms.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="admin-content">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1><i class="fas fa-user"></i> {{ lead.first_name }} {{ lead.last_name }}</h1>
+        <p class="subtitle">Lead Details and Information</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-flex gap-2 mb-3">
+        <a href="{% url 'admin:leads' %}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Back to Leads
+        </a>
+        <a href="{% url 'admin:lead_edit' lead.pk %}" class="btn btn-primary">
+            <i class="fas fa-edit"></i> Edit Lead
+        </a>
+        {% if lead.status != 'converted' %}
+        <form method="post" action="{% url 'admin:lead_convert' lead.pk %}" style="display: inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-success" 
+                    onclick="return confirm('Convert this lead to a customer?')">
+                <i class="fas fa-user-check"></i> Convert to Customer
+            </button>
+        </form>
+        {% endif %}
+        <a href="{% url 'admin:lead_delete' lead.pk %}" class="btn btn-danger" data-confirm-delete>
+            <i class="fas fa-trash"></i> Delete Lead
+        </a>
+    </div>
+
+    <!-- Lead Information Grid -->
+    <div class="form-grid">
+        <!-- Basic Information -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-user"></i> Basic Information</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Full Name</label>
+                <div class="form-control" readonly>{{ lead.first_name }} {{ lead.last_name }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Email Address</label>
+                <div class="form-control" readonly>
+                    <a href="mailto:{{ lead.email }}">{{ lead.email }}</a>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Phone Number</label>
+                <div class="form-control" readonly>
+                    <a href="tel:{{ lead.phone }}">{{ lead.phone }}</a>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Lead Source</label>
+                <div class="form-control" readonly>
+                    <span class="badge badge-info">{{ lead.source.name }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status and Scoring -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-chart-line"></i> Status & Scoring</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Current Status</label>
+                <div class="form-control" readonly>
+                    {% if lead.status == 'new' %}
+                    <span class="badge badge-info">New</span>
+                    {% elif lead.status == 'qualified' %}
+                    <span class="badge badge-warning">Qualified</span>
+                    {% elif lead.status == 'converted' %}
+                    <span class="badge badge-success">Converted</span>
+                    {% elif lead.status == 'lost' %}
+                    <span class="badge badge-danger">Lost</span>
+                    {% else %}
+                    <span class="badge badge-secondary">{{ lead.get_status_display }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Interest Level</label>
+                <div class="form-control" readonly>
+                    {% if lead.interest_level == 'high' %}
+                    <span class="badge badge-success">High Interest</span>
+                    {% elif lead.interest_level == 'medium' %}
+                    <span class="badge badge-warning">Medium Interest</span>
+                    {% elif lead.interest_level == 'low' %}
+                    <span class="badge badge-secondary">Low Interest</span>
+                    {% else %}
+                    <span class="badge badge-info">{{ lead.interest_level|title }}</span>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Lead Score</label>
+                <div class="form-control" readonly>
+                    <strong class="{% if lead.score >= 80 %}text-success{% elif lead.score >= 60 %}text-warning{% else %}text-muted{% endif %}">
+                        {{ lead.score|default:0 }}/100
+                    </strong>
+                    {% if lead.score >= 80 %}
+                    <small class="text-success"> - High Priority</small>
+                    {% elif lead.score >= 60 %}
+                    <small class="text-warning"> - Medium Priority</small>
+                    {% else %}
+                    <small class="text-muted"> - Low Priority</small>
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if lead.converted_at %}
+            <div class="form-group">
+                <label class="form-label">Conversion Date</label>
+                <div class="form-control" readonly>
+                    {{ lead.converted_at|date:"F d, Y H:i" }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Solar Project Details -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-solar-panel"></i> Solar Project Details</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Property Type</label>
+                <div class="form-control" readonly>{{ lead.property_type|default:"Not specified" }}</div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Estimated Capacity</label>
+                <div class="form-control" readonly>
+                    {% if lead.estimated_capacity %}
+                    {{ lead.estimated_capacity }} kW
+                    {% else %}
+                    Not specified
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Budget Range</label>
+                <div class="form-control" readonly>{{ lead.budget_range|default:"Not specified" }}</div>
+            </div>
+        </div>
+
+        <!-- Timeline Information -->
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-clock"></i> Timeline</h3>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Created Date</label>
+                <div class="form-control" readonly>
+                    {{ lead.created_at|date:"F d, Y H:i" }}
+                    <small class="text-muted">({{ lead.created_at|timesince }} ago)</small>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">Last Updated</label>
+                <div class="form-control" readonly>
+                    {{ lead.updated_at|date:"F d, Y H:i" }}
+                    <small class="text-muted">({{ lead.updated_at|timesince }} ago)</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Original Data Section (if available) -->
+    {% if lead.original_data %}
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-database"></i> Original Submission Data</h3>
+            <p class="card-subtitle">Raw data from the original lead submission</p>
+        </div>
+        
+        <div class="form-group">
+            <pre style="background: #f8f9fa; padding: 15px; border-radius: 5px; font-size: 0.9rem; overflow-x: auto;">{{ lead.original_data|pprint }}</pre>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Activity Log Section -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h3><i class="fas fa-history"></i> Activity Log</h3>
+            <p class="card-subtitle">Recent activities and interactions for this lead</p>
+        </div>
+        
+        <div class="activity-feed">
+            <div class="activity-item">
+                <div class="activity-icon new-lead">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Lead Created</h4>
+                    <p>Lead was created from {{ lead.source.name }}</p>
+                    <div class="activity-time">{{ lead.created_at|date:"F d, Y H:i" }}</div>
+                </div>
+            </div>
+            
+            {% if lead.converted_at %}
+            <div class="activity-item">
+                <div class="activity-icon conversion">
+                    <i class="fas fa-user-check"></i>
+                </div>
+                <div class="activity-content">
+                    <h4>Lead Converted</h4>
+                    <p>Lead was successfully converted to customer</p>
+                    <div class="activity-time">{{ lead.converted_at|date:"F d, Y H:i" }}</div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Placeholder for future activity tracking -->
+            <div class="activity-item">
+                <div class="activity-content">
+                    <p class="text-muted"><em>Additional activity tracking will be implemented in future updates</em></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Add any lead-specific JavaScript here
+document.addEventListener('DOMContentLoaded', function() {
+    // Highlight high-priority leads
+    const scoreElement = document.querySelector('.text-success, .text-warning');
+    if (scoreElement && scoreElement.textContent.includes('/100')) {
+        const score = parseInt(scoreElement.textContent);
+        if (score >= 80) {
+            document.querySelector('.page-header').style.borderLeft = '4px solid #4CAF50';
+        } else if (score >= 60) {
+            document.querySelector('.page-header').style.borderLeft = '4px solid #ff9800';
+        }
+    }
+});
+</script>
+{% endblock %}

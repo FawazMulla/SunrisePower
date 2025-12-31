@@ -151,11 +151,11 @@ class Customer(models.Model):
         ]
         constraints = [
             models.CheckConstraint(
-                condition=models.Q(total_value__gte=0),
+                check=models.Q(total_value__gte=0),
                 name='valid_total_value'
             ),
             models.CheckConstraint(
-                condition=models.Q(outstanding_amount__gte=0),
+                check=models.Q(outstanding_amount__gte=0),
                 name='valid_outstanding_amount'
             ),
         ]
