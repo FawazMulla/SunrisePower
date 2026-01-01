@@ -246,15 +246,20 @@ class SecurityHeadersMiddleware(MiddlewareMixin):
             if response.get('Content-Type', '').startswith('text/html'):
                 response['Content-Security-Policy'] = (
                     "default-src 'self'; "
-                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
-                    "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
-                    "img-src 'self' data: https:; "
+                    "script-src 'self' 'unsafe-inline' 'unsafe-eval' "
+                    "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://code.jquery.com; "
+                    "style-src 'self' 'unsafe-inline' "
+                    "https://cdnjs.cloudflare.com https://fonts.googleapis.com; "
+                    "img-src 'self' data: blob: https:; "
                     "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; "
-                    "connect-src 'self' https://api.cohere.ai https://api.emailjs.com https://cdnjs.cloudflare.com; "
+                    "connect-src 'self' "
+                    "https://api.cohere.ai https://api.emailjs.com "
+                    "https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; "
                     "worker-src 'self' blob:; "
                     "child-src 'self' blob:; "
                     "manifest-src 'self';"
-                )
+)
+
             
         except Exception as e:
             # Don't let security header errors break the response
